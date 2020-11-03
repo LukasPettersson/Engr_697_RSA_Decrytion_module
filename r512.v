@@ -1,31 +1,31 @@
 module r512(
-			input  [511:0] q,p,d,
-			output reg [511:0] t,qinv,m,h,constant_t,
+			input  [511:0] q,p,
+			output reg [511:0] m,
 			input clk, start
 );
 
 
 			wire [511:0] b;
 			wire [511:0] rem;
-			reg [511:0] quot;
+			reg [511:0] quot, t,qinv,h;
 			reg [511:0] temp1;
 			reg [511:0] temp2;
 			reg [511:0] b2;
 			reg [511:0] b1;
 			reg [1:0]state;
-			wire [511:0] divRem, hRem, d1Rem, d2Rem;
-			wire divDone, hDone, d1Done, d2Done;
-			reg divStart, hStart, onFlag;
+			wire [511:0] divRem, hRem, d1Rem, d2Rem, m1Rem, m2Rem;
+			wire divDone, hDone, d1Done, d2Done, m1Done, m2Done;
+			reg divStart, hStart, m1Start, m2Start, onFlag;
 			
 			reg [511:0] m1,m2,d1,d2;
 		   reg [511:0] e,f;
 		   wire [511:0] x,y;
 		   reg [511:0] t_holder;
-	    	wire [511:0] n_prime;
+			reg [9:0] d;
 			
-					 assign n_prime = p * q;
-                assign x = p-1;
-                assign y = q-1;
+			assign x = p-1;
+			assign y = q-1;
+			assign b = b2-quot*b1;
 			
 			divide_by_subtraction dbs(
 												.start(divStart),
@@ -38,42 +38,62 @@ module r512(
 											);
 											
 			divide_by_subtraction dbs_h(
-												.start(hStart),
+												.start(hStart && m1Done && m2Done ),
 												.clk(clk),
 												.dividend(h),
 												.divisor(p),
 												.outputcount(),
-												.remainder(divRem),
+												.remainder(hRem),
 												.done(hDone)
 											);
 											
 			divide_by_subtraction dbs_d1(
 												.start(onFlag),
 												.clk(clk),
-												.dividend(),
-												.divisor(),
+												.dividend(d),
+												.divisor(x),
 												.outputcount(),
-												.remainder(),
+												.remainder(d1Rem),
 												.done(d1Done)
 											);
 											
 			divide_by_subtraction dbs_d2(
 												.start(onFlag),
 												.clk(clk),
-												.dividend(),
-												.divisor(),
+												.dividend(d),
+												.divisor(y),
 												.outputcount(),
-												.remainder(),
+												.remainder(d2Rem),
 												.done(d2Done)
 											);
+			divide_by_subtraction dbs_m1(
+												.start(m1Start),
+												.clk(clk),
+												.dividend(e),
+												.divisor(p),
+												.outputcount(),
+												.remainder(m1Rem),
+												.done(m1Done)
+											);
+			divide_by_subtraction dbs_m2(
+												.start(m2Start),
+												.clk(clk),
+												.dividend(f),
+												.divisor(q),
+												.outputcount(),
+												.remainder(m2Rem),
+												.done(m2Done)
+											);
 											
-											
-			assign b = b2-quot*b1;
+
 			
 			initial begin
 				divStart <= 1'b0;
 				hStart <= 1'b0;
+				m1Start <= 1'b0;
+				m2Start <= 1'b0;
 				onFlag <= 1'b1;
+				d <= 10'h400;
 			end
 			
 			//output here is qinv
@@ -112,35 +132,38 @@ module r512(
 				else if(state==2)
 					begin
 					  t<=b1+p;
-						if(t>p)
+						if(t>p) begin
 							qinv<=b1;
 							hStart <= 1'b1;
-						else
+							end
+						else begin
 							qinv<=t;
 							hStart <= 1'b1;
-                    end	
+                    end
+						  end	
 			    end
 
            always@(posedge clk)
-           begin // x = p - 1 y = q - 1
-    //       d1 <= d % x; // 1024 mod 88 = 56
-      //     d2 <= d % y; // 1024 mod 52 = 36
+           begin 
+
+			  
+			  if(d1Done && d2Done) begin
            e <= 1'b1 << d1;// 2^56
            f <= 1'b1 << d2; //2^36
-           m1 <=  e % p; // 2
-           m2 <= f % q;
+				m1Start <= 1'b1;
+				m2Start <= 1'b1;
+				end
 
+				if(m1Done && m2Done)
+				begin
            h <= (qinv *(m1-m2));   // this is only true if m1 > m2. Because " a mod b != -a mod b "
+				end
+			  
 			  if(hDone)
 			  begin
-           m <= m2 + (h*q);
+           m <= m2 + (hRem*q);
 			  end
 			  
-			  //for t
-			//  t_holder <= m * m;
-			// constant_t <= t_holder % n_prime;
-			// t_holder <= m % n_prime;
-			// constant_t <= t_holder * t_holder;
 				
 				
            end

@@ -1,0 +1,45 @@
+module r_top_level_tb();
+
+reg [31:0] q,p;
+wire [31:0] m;
+
+reg clk, start;
+
+
+integer i;
+
+r_top_level dut(
+				.q(q), //32 bit
+				.p(p),	//32-bit
+				.m(m), //wire 32
+				.clk(clk)	 //bit
+				);
+
+always 
+	#5 clk = ~clk;
+
+
+initial begin
+	clk =0;
+	start = 0;
+	i = 0;
+end
+
+
+initial begin
+	
+	for( i=0; i<16; i = i+1) begin
+		#5;
+		
+		q = $random;
+		p = $random;
+		
+		#5;
+	end
+	#1000;
+	
+	
+
+end
+
+endmodule
