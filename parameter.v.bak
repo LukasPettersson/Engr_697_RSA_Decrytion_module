@@ -1,7 +1,6 @@
 `ifndef __parameter_
 `define __parameter_
 
-`define MAX_DATA 512
 `define DATA_WIDTH 32 
 `define ADDR_WIDTH 5
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) 

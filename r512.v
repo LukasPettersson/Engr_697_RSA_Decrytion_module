@@ -1,26 +1,28 @@
+`include "parameter.v"
+
 module r512(
-			input  [511:0] q,p,
-			output reg [511:0] m,
+			input  [`MAX_DATA - 1 :0] q,p,
+			output reg [`MAX_DATA - 1 :0] m,
 			input clk, start
 );
 
 
-			wire [511:0] b;
-			wire [511:0] rem;
-			reg [511:0] quot, t,qinv,h;
-			reg [511:0] temp1;
-			reg [511:0] temp2;
-			reg [511:0] b2;
-			reg [511:0] b1;
+			wire [`MAX_DATA - 1 :0] b;
+			wire [`MAX_DATA - 1 :0] rem;
+			reg [`MAX_DATA - 1 :0] quot, t,qinv,h;
+			reg [`MAX_DATA - 1 :0] temp1;
+			reg [`MAX_DATA - 1 :0] temp2;
+			reg [`MAX_DATA - 1 :0] b2;
+			reg [`MAX_DATA - 1 :0] b1;
 			reg [1:0]state;
-			wire [511:0] divRem, hRem, d1Rem, d2Rem, m1Rem, m2Rem;
+			wire [`MAX_DATA - 1 :0] divRem, hRem, d1Rem, d2Rem, m1Rem, m2Rem;
 			wire divDone, hDone, d1Done, d2Done, m1Done, m2Done;
 			reg divStart, hStart, m1Start, m2Start, onFlag;
 			
-			reg [511:0] m1,m2,d1,d2;
-		   reg [511:0] e,f;
-		   wire [511:0] x,y;
-		   reg [511:0] t_holder;
+			reg [`MAX_DATA - 1 :0] m1,m2,d1,d2;
+		   reg [`MAX_DATA - 1 :0] e,f;
+		   wire [`MAX_DATA - 1 :0] x,y;
+		   reg [`MAX_DATA - 1 :0] t_holder;
 			reg [9:0] d;
 			
 			assign x = p-1;

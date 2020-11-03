@@ -1,7 +1,9 @@
+`include "parameter.v"
+
 module r_top_level_tb();
 
-reg [31:0] q,p;
-wire [31:0] m;
+reg [`DATA_WIDTH -1 :0] q,p;
+wire [`DATA_WIDTH -1 :0] m, pTest;
 
 reg clk, start;
 
@@ -12,7 +14,8 @@ r_top_level dut(
 				.q(q), //32 bit
 				.p(p),	//32-bit
 				.m(m), //wire 32
-				.clk(clk)	 //bit
+				.clk(clk),	 //bit
+				.pTest(pTest)
 				);
 
 always 

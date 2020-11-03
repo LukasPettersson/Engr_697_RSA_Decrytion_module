@@ -1,15 +1,18 @@
+`include "parameter.v"
+
 module r_top_level(
-				input [31:0] q,
-				input [31:0] p,
-				output wire [31:0] m,
-				input clk
+				input [`DATA_WIDTH -1 :0] q,
+				input [`DATA_WIDTH -1 :0] p,
+				output wire [`DATA_WIDTH -1 :0] m,
+				input clk,
+				output reg [`DATA_WIDTH -1 :0] pTest
 );
 
-reg [511:0] qOut;
-reg [511:0] pOut;
+reg [`MAX_DATA - 1 :0] qOut;
+reg [`MAX_DATA - 1 :0] pOut;
 reg inputDone;
 reg [4:0] count;
-
+integer i;
 initial begin
 	inputDone <= 1'b0;
 	count <= 0;
@@ -19,15 +22,17 @@ end
 always @ (posedge clk) begin
 	
 	
-	if(count <= 5'b10000) begin
-		qOut <= {q, qOut[511:32]};
-		pOut <= {p, pOut[511:32]};
+	if(count < 5'b10000) begin
+		qOut <= {q, qOut[`MAX_DATA - 1 :`DATA_WIDTH]};
+		pOut <= {p, pOut[`MAX_DATA - 1 :`DATA_WIDTH]};
 		count <= count + 1'b1;
+		if(count == 5'b10000) begin inputDone <= 1'b1; end
 	end
 	else begin
 		qOut <= qOut;
 		pOut <= pOut; 
-		inputDone <= 1'b1;
+	//	inputDone <= 1'b1;
+		pTest <= pOut[`DATA_WIDTH - 1 : 0];
 	end
 end
 
