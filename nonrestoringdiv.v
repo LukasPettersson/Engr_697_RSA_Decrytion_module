@@ -71,6 +71,7 @@ always @ (posedge clk)
 
 				end
 				done = 1;
+				state = 0;
 				end
 		endcase
 	end
