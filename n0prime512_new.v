@@ -9,7 +9,7 @@ module n0prime(
 
 reg [511:0] temp1, temp2;
 reg [511:0] b1, b2;
-reg [511:0] b;
+wire [511:0] b;
 reg [2:0] state = 5;
 reg divStart;
 wire divDone;
@@ -31,7 +31,7 @@ always@ (posedge clk) begin
 if(start)
 		state = 0;
 end
-
+assign b = b2 - Q_out*b1;
 always@ (posedge clk) begin
 		case(state)
 			0: begin //start state
@@ -56,16 +56,22 @@ always@ (posedge clk) begin
 				end
 			3:
 				begin
-					b = b2 - Q_out*b1;
+
 					if(rem >> 1 && rem <<1) // what does this check?
 						begin
 							temp1 = temp2;
 							temp2 = rem;
 							b2 = b1;
 							b1 = b;
+
 							state = 1;
 						end
 						else begin
+							temp1 = temp2;
+							temp2 = rem;
+							b2 = b1;
+							b1 = b;
+
 							state = 4;
 						end
 				end

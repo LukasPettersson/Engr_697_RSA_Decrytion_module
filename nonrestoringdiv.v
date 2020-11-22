@@ -26,21 +26,23 @@ assign R = aReg;
 always @ (posedge clk)
 	begin
 		case(state)
-			0:
+			0: begin
+			done = 0;
 			if(start)
-			begin
-				qReg = Q;
-				mReg = M;
-				aReg = A;
-				done = 0;
-				count = 512'd512;
-				state = 1;
-				flag = 1;
+				begin
+					qReg = Q;
+					mReg = M;
+					aReg = A;
+					done = 0;
+					count = 512'd512;
+					state = 1;
+					flag = 1;
+				end
 			end
 			1:
 			if(count > 0) //while(count)
 				begin
-				aReg = {aReg[510 : 0] , qReg[511]};
+				aReg = {aReg[510 : 0], qReg[511]};
 
 				if(flag == 1'b1) begin aReg = aReg - mReg; end
 				else begin aReg = aReg + mReg; end
