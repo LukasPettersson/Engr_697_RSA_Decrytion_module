@@ -1,7 +1,7 @@
 module n0prime_new_tb();
 
 
-
+//real output is the correct n0prime output!!
 reg [1024:0] p,q;
 wire [31:0] t,qinv,real_output;
 reg start, clk;
