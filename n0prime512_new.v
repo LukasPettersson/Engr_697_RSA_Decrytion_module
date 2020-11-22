@@ -1,6 +1,6 @@
 module n0prime(
-							input [2047:0] p,q,
-							output reg [2047:0] t,qinv,
+							input [1024:0] p,q,
+							output reg [1024:0] t,qinv,
 							input start, clk,
 							output done);
 	/*
@@ -12,20 +12,20 @@ module n0prime(
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	*/
 
-reg [2047:0] temp1, temp2;
-reg [2047:0] b1, b2;
-wire [2047:0] b;
+reg [1024:0] temp1, temp2;
+reg [1024:0] b1, b2;
+wire [1024:0] b;
 reg [2:0] state = 5;
 reg divStart;
 wire divDone;
-wire [2047:0] Q_out, rem;
+wire [1024:0] Q_out, rem;
 
 
 nonrestoringdiv div(
 										.clk(clk),
 										.Q(temp1),
 										.M(temp2),
-										.A(2048'b0),
+										.A(1025'b0),
 										.start(divStart),
 										.Q_out(Q_out),
 										.R(rem),
