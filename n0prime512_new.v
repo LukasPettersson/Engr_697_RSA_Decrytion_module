@@ -1,7 +1,8 @@
 module n0prime(
 							input [1024:0] p,q,
-							output reg [1024:0] t,qinv,
+							output reg [31:0] t,qinv,
 							input start, clk,
+							output[31:0] real_output,
 							output done);
 	/*
 		n0prime = -n^-1mod(2^w)
@@ -19,8 +20,7 @@ reg [2:0] state = 5;
 reg divStart;
 wire divDone;
 wire [1024:0] Q_out, rem;
-
-
+assign real_output = -qinv;
 nonrestoringdiv div(
 										.clk(clk),
 										.Q(temp1),
@@ -85,9 +85,9 @@ always@ (posedge clk) begin
 					begin
 						t<=b1+p;
 						if(t>p)
-							qinv<=b1;
+							qinv<=b1[31:0];
 						else
-							qinv<=t;
+							qinv<=t[31:0];
 						end
 				end
 			5:
