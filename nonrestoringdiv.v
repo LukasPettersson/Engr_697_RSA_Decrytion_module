@@ -1,16 +1,16 @@
 module nonrestoringdiv(
 	input clk,
-	input  [511 : 0] Q, // Q is quotient, but since it's also an input, we're gonna use another variable for quotient
-	input  [511 : 0] M, // M is divisor
-	input  [511 : 0] A, // A is accumulator and also remainder, same deal as Q
+	input  [2047 : 0] Q, // Q is quotient, but since it's also an input, we're gonna use another variable for quotient
+	input  [2047 : 0] M, // M is divisor
+	input  [2047 : 0] A, // A is accumulator and also remainder, same deal as Q
 	input start,
-	output [511 : 0] Q_out, //Quotient
-	output [511 : 0] R, //Remainder
+	output [2047 : 0] Q_out, //Quotient
+	output [2047 : 0] R, //Remainder
 	output reg done);
 
-reg [511 : 0] qReg, mReg, aReg;
+reg [2047 : 0] qReg, mReg, aReg;
 reg flag;
-reg [511 : 0] count;
+reg [2047 : 0] count;
 reg state = 0;
 
 /*
@@ -34,7 +34,7 @@ always @ (posedge clk)
 					mReg = M;
 					aReg = A;
 					done = 0;
-					count = 512'd512;
+					count = 2048'd2048;
 					state = 1;
 					flag = 1;
 				end
@@ -42,26 +42,26 @@ always @ (posedge clk)
 			1:
 			if(count > 0) //while(count)
 				begin
-				aReg = {aReg[510 : 0], qReg[511]};
+				aReg = {aReg[2046 : 0], qReg[2047]};
 
 				if(flag == 1'b1) begin aReg = aReg - mReg; end
 				else begin aReg = aReg + mReg; end
 
-				if(aReg[511] == 1'b1)
+				if(aReg[2047] == 1'b1)
 					begin
-						qReg = {qReg[510 : 0], 1'b0};
+						qReg = {qReg[2046 : 0], 1'b0};
 						flag = 1'b0;
 					end
 					else
 					begin
-						qReg = {qReg[510 : 0], 1'b1};
+						qReg = {qReg[2046 : 0], 1'b1};
 						flag = 1'b1;
 					end
 					count = count - 1;
 				end //end if count
 				else
 				begin
-				if(aReg[511] == 1'b1) begin
+				if(aReg[2047] == 1'b1) begin
 					aReg = aReg + mReg;
 					mReg = mReg;
 					qReg = qReg;
