@@ -13,7 +13,7 @@ module constant_r_t_new(
 /**************************************************************************************************/
 
 /****** Stuff for r ******/
-reg [1024 : 0] q_r_Reg, m_r_Reg, a_r_Reg;
+reg [1024 : 0] q_r_Reg, m_r_Reg, a_r_Reg = 1025'b0;
 reg flag_r;
 reg [1024 : 0] count_r;
 reg [12 : 0] div_const = 11'd1024; 
@@ -21,7 +21,7 @@ reg [12 : 0] div_const = 11'd1024;
 
 /****** Stuff for t ******/
 
-reg [2047 : 0] q_t_Reg, m_t_Reg, a_t_Reg;
+reg [2047 : 0] q_t_Reg, m_t_Reg, a_t_Reg = 2048'b0;
 reg flag_t;
 reg [2047 : 0] count_t;
 
