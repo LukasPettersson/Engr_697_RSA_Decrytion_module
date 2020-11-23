@@ -12,10 +12,11 @@ module constant_r_t_new(
 	);
 
 
-/**************************************************************************************************/
-/****** Provided doc has screenshots of results with proof based on big number calculations  ******/
-/****** https://docs.google.com/document/d/1Jo82BKLWtnUedrWtl--ApAaL4YTivSimc5x1Ljk8CsQ/edit ******/
-/**************************************************************************************************/
+/********************************************************************************************************/
+/********* Provided doc has screenshots of results with proof based on big number calculations  *********/
+/*** https://docs.google.com/document/d/1Jo82BKLWtnUedrWtl--ApAaL4YTivSimc5x1Ljk8CsQ/edit?usp=sharing ***/
+/********************************************************************************************************/
+
 
 /****** Stuff for r ******/
 reg [1024 : 0] q_r_Reg, m_r_Reg, a_r_Reg;
