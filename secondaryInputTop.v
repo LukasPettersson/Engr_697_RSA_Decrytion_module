@@ -13,20 +13,6 @@ t:
 reg startCompute;
 reg n0prime_flag,r_t_flag;
 reg [1:0] state;
-/* placeholder for when the r/t module is done
-module constant_r_t_new(
-	input clk,
-	input  [1024 : 0] Q_r, // Q_r is quotient, but since it's also an input, we're gonna use another variable for quotient
-	input  [1024 : 0] M_r, // M is divisor
-	input  [1024 : 0] A_r, // A is accumulator and also remainder, same deal as Q_r
-	input start,
-	output [1024 : 0] R_r, //Remainder
-	input  [2047 : 0] M_t, // M_t is divisor
-	input  [2047 : 0] A_t, // A_t is accumulator and also remainder, same deal as Q_t
-	output [1023 : 0] R_t, //Remainder
-	output reg done
-	);
-  */
 
 constant_r_t_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
@@ -42,6 +28,7 @@ n0prime n0(   .n(n),
               .done(n0prime_done));
 
 always@ (posedge clk) begin
+  done = 0;
   if(start) begin
     r_t_flag = 0;
     n0prime_flag = 0;
@@ -77,6 +64,11 @@ always@ (posedge clk) begin
 
   2: begin
     done = 1;
+    state = 3;
+  end
+
+  3: begin //idle state
+    done = 0;
   end
   endcase
 end
