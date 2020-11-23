@@ -9,19 +9,39 @@ module secondaryInputTop( input start, clk,
 
 t:
 */
-reg start, clk;
+reg startCompute, clk;
 reg n0prime_flag,r_t_flag;
 
 /* placeholder for when the r/t module is done
-r_t rt0(
+module constant_r_t_new(
+	input clk,
+	input  [1024 : 0] Q_r, // Q_r is quotient, but since it's also an input, we're gonna use another variable for quotient
+	input  [1024 : 0] M_r, // M is divisor
+	input  [1024 : 0] A_r, // A is accumulator and also remainder, same deal as Q_r
+	input start,
+	output [1024 : 0] R_r, //Remainder
+	input  [2047 : 0] M_t, // M_t is divisor
+	input  [2047 : 0] A_t, // A_t is accumulator and also remainder, same deal as Q_t
+	output [1023 : 0] R_t, //Remainder
+	output reg done
+	);
 
-
-  );
   */
+
+  constant_r_t rt0( .start(startCompute),
+                    .clk(clk),
+                    .done(r_t_done),
+                    .Q_r(),
+                    .M_r(),
+                    .A_r(),
+                    .R_r(),
+                    .M_t(),
+                    .A_t(),
+                    .R_t());
 //which one is right output?
 n0prime n0(   .n(n),
               .n0prime(n0p),
-              .start(start),
+              .start(startCompute),
               .clk(clk)
               .done(n0prime_done));
 
@@ -47,11 +67,11 @@ always (@posedge clk) begin
 
   case(state)
   0: begin
-    start = 1;
+    startCompute = 1;
     state = 1;
   end
   1:begin
-    start = 0;
+    startCompute = 0;
     if(n0prime_flag && r_t_flag) begin
       state = 2;
     end
