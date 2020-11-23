@@ -1,5 +1,5 @@
 module n0prime(
-							input [1024:0] n,
+							input [1023:0] n,
 							input start, clk,
 							output[31:0] n0prime,
 							output reg done);

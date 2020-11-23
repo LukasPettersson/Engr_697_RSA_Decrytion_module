@@ -1,8 +1,8 @@
 module constant_r_t_new(
 	input clk,
-	input  [1024 : 0] M_r, // M is divisor
+	input  [1023 : 0] M_r, // M is divisor
 	input start,
-	output [1024 : 0] R_r, //Remainder
+	output [1023 : 0] R_r, //Remainder
 	output [1023 : 0] R_t, //Remainder
 	output reg done
 	);
@@ -16,7 +16,7 @@ module constant_r_t_new(
 reg [1024 : 0] q_r_Reg, m_r_Reg, a_r_Reg = 1025'b0;
 reg flag_r;
 reg [1024 : 0] count_r;
-reg [12 : 0] div_const = 11'd1024; 
+reg [12 : 0] div_const = 11'd1024;
 
 
 /****** Stuff for t ******/
@@ -38,7 +38,7 @@ always @ (posedge clk)
 		case(state)
 			2'b00:
 			begin
-			done = 0;	
+			done = 0;
 			if(start)
 			begin
 				q_r_Reg = 1'b1 << div_const;
@@ -85,7 +85,7 @@ always @ (posedge clk)
 				end
 				state = 2'b10; // Continue to state 2 where starting t mod n process
 				end
-			2'b10: 
+			2'b10:
 			begin
 				q_t_Reg = a_r_Reg * a_r_Reg;
 				m_t_Reg = M_r; //n
