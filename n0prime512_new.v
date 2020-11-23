@@ -27,7 +27,6 @@ nonrestoringdiv div(
 										.clk(clk),
 										.Q(temp1),
 										.M(temp2),
-										.A(1025'b0),
 										.start(divStart),
 										.Q_out(Q_out),
 										.R(rem),
