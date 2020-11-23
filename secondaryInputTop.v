@@ -28,16 +28,14 @@ module constant_r_t_new(
 
   */
 
-  constant_r_t rt0( .start(startCompute),
-                    .clk(clk),
-                    .done(r_t_done),
-                    .Q_r(),
-                    .M_r(),
-                    .A_r(),
-                    .R_r(),
-                    .M_t(),
-                    .A_t(),
-                    .R_t());
+constant_r_t_new rt0(   .clk(clk),
+                        .M_r(), // M is divisor this is n
+                        .A_r(), // A is accumulator and also remainder, same deal as Q_r -- 0 will work on removing
+                        .start(),
+                        .R_r(), //Remainder for r
+                        .A_t(), // A_t is accumulator and also remainder, same deal as Q_t -- 0 will work on removing
+                        .R_t(), //Remainder for t
+                        .done()); //done flag triggers when t is done
 //which one is right output?
 n0prime n0(   .n(n),
               .n0prime(n0p),
