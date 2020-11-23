@@ -2,13 +2,13 @@ module nonrestoringdiv(
 	input clk,
 	input  [1024 : 0] Q, // Q is quotient, but since it's also an input, we're gonna use another variable for quotient
 	input  [1024 : 0] M, // M is divisor
-	input  [1024 : 0] A, // A is accumulator and also remainder, same deal as Q
 	input start,
 	output [1024 : 0] Q_out, //Quotient
 	output [1024 : 0] R, //Remainder
 	output reg done);
 
-reg [1024 : 0] qReg, mReg, aReg;
+reg [1024 : 0] qReg, mReg;
+reg [1024 : 0] aReg = 1025'b0;
 reg flag;
 reg [1024 : 0] count;
 reg state = 0;
@@ -32,7 +32,7 @@ always @ (posedge clk)
 				begin
 					qReg = Q;
 					mReg = M;
-					aReg = A;
+					aReg = 1025'b0;
 					done = 0;
 					count = 1025'd1025;
 					state = 1;
