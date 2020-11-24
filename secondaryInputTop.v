@@ -75,12 +75,12 @@ always@ (posedge clk) begin
     state = 3;
   end
 
-  3: begin //idle state
+  3: begin
     if(count <= 32) begin
-      r = r_reg[1024:992];
+      r = r_reg[1023:992];
       r_reg = {r_reg[991:0],32'b0};
 
-      t = t_reg[1024:992];
+      t = t_reg[1023:992];
       t_reg = {t_reg[991:0],32'b0};
       count = count +1;
     end

@@ -93,6 +93,8 @@ initial begin
 	exp_state = INIT_STATE;
 	k_e1 = `TOTAL_ADDR - 1;
 	k_e2 = `DATA_WIDTH - 1;
+	//out stuff
+	n_full = 0;
 end
 
 
