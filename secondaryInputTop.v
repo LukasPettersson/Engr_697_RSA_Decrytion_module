@@ -1,8 +1,9 @@
 module secondaryInputTop( input start, clk,
                           input [1023:0] n,
                           output [31:0] n0p,
-                          output [1023:0] r, t,
-                          output reg done);
+                          output reg [31:0] r, t,
+                          output reg done,
+                          output reg startTransfer);
 
 
 
@@ -11,14 +12,16 @@ module secondaryInputTop( input start, clk,
 t:
 */
 reg startCompute;
-reg n0prime_flag,r_t_flag;
+reg n0prime_flag, r_t_flag;
+reg [1023:0] r_reg, t_reg;
+wire [1023:0] r_wire, t_wire;
 reg [1:0] state;
-
+reg [6:0] count;
 constant_r_t_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
                         .start(start),
-                        .R_r(r), //Remainder for r
-                        .R_t(t), //Remainder for t
+                        .R_r(r_wire), //Remainder for r
+                        .R_t(t_wire), //Remainder for t
                         .done(r_t_done)); //done flag triggers when t is done
 //which one is right output?
 n0prime n0(   .n(n),
@@ -27,11 +30,14 @@ n0prime n0(   .n(n),
               .clk(clk),
               .done(n0prime_done));
 
+
 always@ (posedge clk) begin
   done = 0;
   if(start) begin
     r_t_flag = 0;
     n0prime_flag = 0;
+    count = 0;
+    startTransfer = 0;
     state = 0;
   end
 end
@@ -63,12 +69,24 @@ always@ (posedge clk) begin
   end
 
   2: begin
-    done = 1;
+    t_reg = t_wire;
+    r_reg = r_wire;
+    startTransfer = 1;
     state = 3;
   end
 
   3: begin //idle state
-    done = 0;
+    if(count <= 32) begin
+      r = r_reg[1024:992];
+      r_reg = {r_reg[991:0],32'b0};
+
+      t = t_reg[1024:992];
+      t_reg = {t_reg[991:0],32'b0};
+      count = count +1;
+    end
+    else begin
+      done = 1;
+    end
   end
   endcase
 end

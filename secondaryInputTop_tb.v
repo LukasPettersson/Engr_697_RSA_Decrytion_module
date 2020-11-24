@@ -3,15 +3,16 @@ module secondaryInputTop_tb();
 reg start, clk;
 reg [1023:0] n;
 wire [31:0] n0p;
-wire [1023:0] r, t;
-wire done;
+wire [31:0] r, t;
+wire done, startTransfer;
 secondaryInputTop t0(.start(start),
                       .clk(clk),
                       .n(n),
                       .n0p(n0p),
                       .r(r),
                       .t(t),
-                      .done(done));
+                      .done(done),
+                      .startTransfer(startTransfer));
 
 always
   #50 clk = ~clk;
