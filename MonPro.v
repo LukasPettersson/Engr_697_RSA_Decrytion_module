@@ -43,6 +43,8 @@ reg [`DATA_WIDTH - 1 : 0] t [`DATA_WIDTH - 1 : 0];
 //used in monpro algorithm
 reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
 reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
+reg [5 : 0] count_input = 6'd0;
+
 
 // multiply add block components
 reg [`DATA_WIDTH - 1 : 0] carry; // "z" in example code, seemed simpler to call it carry bc it's assigned the carry bit
@@ -53,7 +55,7 @@ reg [`DATA_WIDTH - 1 : 0] m_multiply_add;
 //States for multiply add block component
 parameter S0 = 0, S1 = 1, S2 = 2, S3 = 3, S4 = 4, S5 = 5, S6 = 6, S7 = 7;
 //States for MonPro
-parameter INIT_STATE = 0, LOAD_M_E_N = 1, LOAD_N = 2, COMPUTE_SECONDARY_INPUTS = 3,WAIT_COMPUTE_SECONDARY_INPUTS = 4,WAIT_COMPUTE = 5, CALC_M_BAR = 6;
+parameter INIT_STATE = 0, LOAD_M_E_N = 1, LOAD_N = 2, COMPUTE_SECONDARY_INPUTS = 3, WAIT_COMPUTE_SECONDARY_INPUTS = 4,CATCH_SECONDARY_INPUTS = 5, CALC_M_BAR = 6;
 parameter GET_K_E = 7, BIGLOOP = 8, CALC_C_BAR_M_BAR = 9, CALC_C_BAR_1 = 10, COMPLETE = 11, OUTPUT_RESULT = 12, TERMINAL = 13;
 
 //multiply add block components
@@ -129,11 +131,11 @@ begin
 		LOAD_M_E_N:
 		begin
 		// take in message and private key and n, store in buffers.
-			if(count_input < 'DATA_WIDTH) begin //if i < 32
+			if(count_input < `DATA_WIDTH) begin //if i < 32
 				m[count_input] = m_input;
 				e[count_input] = e_input;
-				n[count_input] <= n_input;
-				n_full = {n[991:0],n_input};
+				n[count_input] = n_input;
+				n_full = {n_full[991:0],n_input};
 				count_input = count_input + 1;
 			end
 			else begin
@@ -158,7 +160,7 @@ begin
 				count_input <= count_input + 1;
 			end
 			else begin
-				exp_state <= WAIT_COMPUTE;
+				exp_state <= CALC_M_BAR;
 			end
 		end
 
@@ -170,14 +172,14 @@ begin
 						x0 <= m[i];
 						y0 <= t[j];
 						z0 <= v[j];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end //end if
 					else if(k ==1) begin
 						v[j] <= s0;
-						z < = c0;
+						carry <= c0;
 						j = j + 1;
-						if(j = 'TOTAL_ADDR) begin //TOTAL_ADDR = 32-bit
+						if(j == `TOTAL_ADDR) begin //TOTAL_ADDR = 32-bit
 							j = 0;
 							state = S1;
 						end
@@ -188,14 +190,14 @@ begin
 					if(k == 0) begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
-						z0 <= v['TOTAL_ADDR];
-						last_c0 <= z;
+						z0 <= v[`TOTAL_ADDR];
+						last_c0 <= carry;
 						k = 1;
 					end //if(k == 0)
 					else if(k == 1) begin
-						v['TOTAL_ADDR] <= s0;
-						v['TOTAL_ADDR + 1] <= c0;
-						state = s2;
+						v[`TOTAL_ADDR] <= s0;
+						v[`TOTAL_ADDR + 1] <= c0;
+						state = S2;
 						k = 0;
 					end //else if
 				end // end S1
@@ -225,7 +227,7 @@ begin
 							k = 1;
 						end
 						else if(k == 1) begin
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							k = 0;
 						end //if(k == 1)
@@ -234,12 +236,12 @@ begin
 								x0 <= m_multiply_add;
 								y0 <= n[j];
 								z0 <= v[j];
-								last_c0 <= z;
+								last_c0 <= carry;
 								k = 1;
 							end
 							else if(k == 1) begin
 								v[j - 1] <= s0;
-								z <= c0;
+								carry <= c0;
 								j = j + 1;
 								if(j == `TOTAL_ADDR) begin //TOTAL_ADDR = 32
 									j = 0;
@@ -248,6 +250,7 @@ begin
 								k = 0;
 							end //if(k == 1)
 						end //else
+					end //if j == 0
 				end //end S3
 				S4:
 				begin
@@ -255,12 +258,12 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
 						v[`TOTAL_ADDR - 1] <= s0;
-						z <= c0;
+						carry <= c0;
 						state = S5;
 						k = 0;
 					end
@@ -271,7 +274,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR + 1];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -299,7 +302,7 @@ begin
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
 						v[i] = 32'h0;
 					end
-					z = 32'h0;
+					carry = 32'h0;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -307,11 +310,8 @@ begin
 				end //end S6
 				S7:
 				begin
-					S7:
-					begin
 						exp_state = GET_K_E;	// go to next state
 						state = S0;
-					end
 				end //end S7
 			endcase
 		end //end CALC_M_BAR
@@ -319,7 +319,7 @@ begin
 		GET_K_E:
 		begin
 			if(e[k_e1][k_e2] == 1) begin
-				$display("e_in[%d][%d] = %d", k_e1, k_e2, e_in[k_e1][k_e2]);
+				$display("e[%d][%d] = %d", k_e1, k_e2, e[k_e1][k_e2]);
 				exp_state = BIGLOOP;
 			end
 			else begin
@@ -343,13 +343,13 @@ begin
 						x0 <= c_bar[i];
 						y0 <= c_bar[j];
 						z0 <= v[j];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin	// second clock: store output
 						// store the output of multiplier
 						v[j] <= s0;
-						z <= c0;
+						carry <= c0;
 						j = j + 1;
 						if(j == `TOTAL_ADDR) begin	// loop end
 							j = 0;
@@ -364,7 +364,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -400,7 +400,7 @@ begin
 							k = 1;
 						end
 						else if(k == 1) begin
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							k = 0;
 						end
@@ -410,12 +410,12 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[j];
 							z0 <= v[j];
-							last_c0 <= z;
+							last_c0 <= carry;
 							k = 1;
 						end
 						else if(k == 1) begin
 							v[j - 1] <= s0;
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							if(j == `TOTAL_ADDR) begin
 								j = 0;
@@ -431,12 +431,12 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
 						v[`TOTAL_ADDR - 1] <= s0;
-						z <= c0;
+						carry <= c0;
 						state = S5;
 						k = 0;
 					end
@@ -447,7 +447,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR + 1];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -472,7 +472,7 @@ begin
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
 						v[i] = 32'h0;
 					end
-					z = 32'h0;
+					carry = 32'h0;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -481,7 +481,7 @@ begin
 				S7:
 				begin
 					$display("k_e1: %d, k_e2: %d", k_e1, k_e2);
-					if(e_in[k_e1][k_e2] == 1) begin
+					if(e[k_e1][k_e2] == 1) begin
 						exp_state = CALC_C_BAR_M_BAR;	// go to c_bar = MonPro(c_bar, m_bar)
 					end
 					else begin
@@ -509,13 +509,13 @@ begin
 						x0 <= c_bar[i];
 						y0 <= m_bar[j];
 						z0 <= v[j];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin	// second clock: store output
 						// store the output of multiplier
 						v[j] <= s0;
-						z <= c0;
+						carry <= c0;
 						j = j + 1;
 						if(j == `TOTAL_ADDR) begin	// loop end
 							j = 0;
@@ -531,7 +531,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -570,7 +570,7 @@ begin
 							k = 1;
 						end
 						else if(k == 1) begin
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							k = 0;
 						end
@@ -580,12 +580,12 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[j];
 							z0 <= v[j];
-							last_c0 <= z;
+							last_c0 <= carry;
 							k = 1;
 						end
 						else if(k == 1) begin
 							v[j - 1] <= s0;
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							if(j == `TOTAL_ADDR) begin
 								j = 0;
@@ -602,12 +602,12 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
 						v[`TOTAL_ADDR - 1] <= s0;
-						z <= c0;
+						carry <= c0;
 						state = S5;
 						k = 0;
 					end
@@ -619,7 +619,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR + 1];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -645,7 +645,7 @@ begin
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
 						v[i] = 32'h0;
 					end
-					z = 32'h0;
+					carry = 32'h0;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -683,13 +683,13 @@ begin
 							x0 <= 32'h00000001;
 							y0 <= c_bar[j];
 							z0 <= v[j];
-							last_c0 <= z;
+							last_c0 <= carry;
 							k = 1;
 						end
 						else if(k == 1) begin	// second clock: store output
 							// store the output of multiplier
 							v[j] <= s0;
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							if(j == `TOTAL_ADDR) begin	// loop end
 								j = 0;
@@ -704,13 +704,13 @@ begin
 							x0 <= 32'h0;
 							y0 <= c_bar[j];
 							z0 <= v[j];
-							last_c0 <= z;
+							last_c0 <= carry;
 							k = 1;
 						end
 						else if(k == 1) begin	// second clock: store output
 							// store the output of multiplier
 							v[j] <= s0;
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							if(j == `TOTAL_ADDR) begin	// loop end
 								j = 0;
@@ -727,7 +727,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -766,7 +766,7 @@ begin
 							k = 1;
 						end
 						else if(k == 1) begin
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							k = 0;
 						end
@@ -776,12 +776,12 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[j];
 							z0 <= v[j];
-							last_c0 <= z;
+							last_c0 <= carry;
 							k = 1;
 						end
 						else if(k == 1) begin
 							v[j - 1] <= s0;
-							z <= c0;
+							carry <= c0;
 							j = j + 1;
 							if(j == `TOTAL_ADDR) begin
 								j = 0;
@@ -798,12 +798,12 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
 						v[`TOTAL_ADDR - 1] <= s0;
-						z <= c0;
+						carry <= c0;
 						state = S5;
 						k = 0;
 					end
@@ -815,7 +815,7 @@ begin
 						x0 <= 32'h0;
 						y0 <= 32'h0;
 						z0 <= v[`TOTAL_ADDR + 1];
-						last_c0 <= z;
+						last_c0 <= carry;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -841,7 +841,7 @@ begin
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
 						v[i] = 0;
 					end
-					z = 32'h0;
+					carry = 32'h0;
 					i = 0;
 					j = 0;
 					k = 0;
