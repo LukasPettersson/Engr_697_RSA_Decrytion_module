@@ -1,3 +1,8 @@
+`define DATA_WIDTH 32 //used
+`define ADDR_WIDTH 5
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
+
 module nonrestoringdiv(
 	input clk,
 	input  [1024 : 0] Q, // Q is quotient, but since it's also an input, we're gonna use another variable for quotient

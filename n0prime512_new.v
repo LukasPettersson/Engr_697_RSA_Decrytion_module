@@ -1,3 +1,8 @@
+`define DATA_WIDTH 32 //used
+`define ADDR_WIDTH 5
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
+
 module n0prime(
 							input [1023:0] n,
 							input start, clk,
