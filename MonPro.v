@@ -66,6 +66,10 @@ reg [`DATA_WIDTH - 1 : 0] last_c0;
 wire [`DATA_WIDTH - 1 : 0] s0;
 wire [`DATA_WIDTH - 1 : 0] c0;
 
+//r_out t_out
+wire [31:0] r_out;
+wire [31:0] t_out;
+wire [31:0] n0p_out;
 //secondary constant components if necessary
 
 
@@ -95,6 +99,7 @@ initial begin
 	k_e2 = `DATA_WIDTH - 1;
 	//out stuff
 	n_full = 0;
+	start_secondary = 0;
 end
 
 
@@ -141,12 +146,14 @@ begin
 				count_input = count_input + 1;
 			end
 			else begin
+				start_secondary = 1;
 				exp_state = COMPUTE_SECONDARY_INPUTS;
 			end
 		end
 
 		COMPUTE_SECONDARY_INPUTS:
 		begin
+			start_secondary = 0;
 			if(startTransfer) begin
 				count_input = 0;
 				exp_state = CATCH_SECONDARY_INPUTS;
@@ -221,18 +228,19 @@ begin
 				S3:
 				begin
 					if(j == 0) begin
-						if(k == 0) begin
-							x0 <= m_multiply_add;
-							y0 <= n[0];
-							z0 <= v[0];
-							last_c0 <= 32'h0;
-							k = 1;
+							if(k == 0) begin
+								x0 <= m_multiply_add;
+								y0 <= n[0];
+								z0 <= v[0];
+								last_c0 <= 32'h0;
+								k = 1;
+							end
+							else if(k == 1) begin
+								carry <= c0;
+								j = j + 1;
+								k = 0;
+							end //if(k == 1)
 						end
-						else if(k == 1) begin
-							carry <= c0;
-							j = j + 1;
-							k = 0;
-						end //if(k == 1)
 						else begin
 							if(k == 0) begin
 								x0 <= m_multiply_add;
@@ -252,7 +260,6 @@ begin
 								k = 0;
 							end //if(k == 1)
 						end //else
-					end //if j == 0
 				end //end S3
 				S4:
 				begin
