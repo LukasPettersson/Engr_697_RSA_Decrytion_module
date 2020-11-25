@@ -1,3 +1,9 @@
+`define DATA_WIDTH 32 //used
+`define ADDR_WIDTH 5
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
+
+
 module MonPro_tb();
 
 
@@ -5,7 +11,7 @@ reg clk,reset, startInput, getResults;
 reg [3:0] state;
 reg [4:0] exp_state;
 wire [31 : 0] res_out;
-reg [31:0] m_input, e_input, n_input;
+reg [`DATA_WIDTH - 1 : 0] m_input, e_input, n_input;
 MonPro mp(.clk(clk),
           .reset(),
           .startInput(startInput),

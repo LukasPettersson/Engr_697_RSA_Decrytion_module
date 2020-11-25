@@ -1,9 +1,15 @@
+`define DATA_LENGTH 32 //used
+`define ADDR_WIDTH 5
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
+`define T_DATA (`DATA_LENGTH * 2)
+
 module constant_r_t_new(
 	input clk,
-	input  [1023 : 0] M_r, // M is divisor
+	input  [`DATA_LENGTH - 1 : 0] M_r, // M is divisor
 	input start,
-	output [1023 : 0] R_r, //Remainder
-	output [1023 : 0] R_t, //Remainder
+	output [`DATA_LENGTH - 1 : 0] R_r, //Remainder
+	output [`DATA_LENGTH - 1 : 0] R_t, //Remainder
 	output reg done
 	);
 
@@ -13,17 +19,17 @@ module constant_r_t_new(
 /**************************************************************************************************/
 
 /****** Stuff for r ******/
-reg [1024 : 0] q_r_Reg, m_r_Reg, a_r_Reg = 1025'b0;
+reg [`DATA_LENGTH : 0] q_r_Reg, m_r_Reg, a_r_Reg = 1025'b0;
 reg flag_r;
-reg [1024 : 0] count_r;
-reg [12 : 0] div_const = 11'd1024;
+reg [`DATA_LENGTH : 0] count_r;
+reg [12 : 0] div_const = 11'd1024; //Need to change to scale up
 
 
 /****** Stuff for t ******/
 
-reg [2047 : 0] q_t_Reg, m_t_Reg, a_t_Reg = 2048'b0;
+reg [`T_DATA - 1 : 0] q_t_Reg, m_t_Reg, a_t_Reg = 2048'b0;
 reg flag_t;
-reg [2047 : 0] count_t;
+reg [`T_DATA - 1 : 0] count_t;
 
 
 /****** Stuff for both ******/
@@ -53,26 +59,26 @@ always @ (posedge clk)
 			2'b01:
 			if(count_r > 0) //while(count_r)
 				begin
-				a_r_Reg = {a_r_Reg[1023 : 0] , q_r_Reg[1024]};
+				a_r_Reg = {a_r_Reg[`DATA_LENGTH - 1 : 0] , q_r_Reg[`DATA_LENGTH]};
 
 				if(flag_r == 1'b1) begin a_r_Reg = a_r_Reg - m_r_Reg; end
 				else begin a_r_Reg = a_r_Reg + m_r_Reg; end
 
-				if(a_r_Reg[1024] == 1'b1)
+				if(a_r_Reg[`DATA_LENGTH] == 1'b1)
 					begin
-						q_r_Reg = {q_r_Reg[1023 : 0], 1'b0};
+						q_r_Reg = {q_r_Reg[`DATA_LENGTH - 1 : 0], 1'b0};
 						flag_r = 1'b0;
 					end
 					else
 					begin
-						q_r_Reg = {q_r_Reg[1023 : 0], 1'b1};
+						q_r_Reg = {q_r_Reg[`DATA_LENGTH - 1 : 0], 1'b1};
 						flag_r = 1'b1;
 					end
 					count_r = count_r - 1;
 				end //end if count_r
 				else
 				begin
-				if(a_r_Reg[1024] == 1'b1) begin
+				if(a_r_Reg[`DATA_LENGTH] == 1'b1) begin
 					a_r_Reg = a_r_Reg + m_r_Reg;
 					m_r_Reg = m_r_Reg;
 					q_r_Reg = q_r_Reg;
@@ -97,26 +103,26 @@ always @ (posedge clk)
 			2'b11:
 				if(count_t > 0) //while(count_t)
 				begin
-				a_t_Reg = {a_t_Reg[2046 : 0] , q_t_Reg[2047]};
+				a_t_Reg = {a_t_Reg[`T_DATA - 2 : 0] , q_t_Reg[`T_DATA - 1]};
 
 				if(flag_t == 1'b1) begin a_t_Reg = a_t_Reg - m_t_Reg; end
 				else begin a_t_Reg = a_t_Reg + m_t_Reg; end
 
-				if(a_t_Reg[2047] == 1'b1)
+				if(a_t_Reg[`T_DATA - 1] == 1'b1)
 					begin
-						q_t_Reg = {q_t_Reg[2046 : 0], 1'b0};
+						q_t_Reg = {q_t_Reg[`T_DATA - 2 : 0], 1'b0};
 						flag_t = 1'b0;
 					end
 					else
 					begin
-						q_t_Reg = {q_t_Reg[2046 : 0], 1'b1};
+						q_t_Reg = {q_t_Reg[`T_DATA - 2 : 0], 1'b1};
 						flag_t = 1'b1;
 					end
 					count_t = count_t - 1;
 				end //end if count_t
 				else
 				begin
-				if(a_t_Reg[2047] == 1'b1) begin
+				if(a_t_Reg[`T_DATA - 1] == 1'b1) begin
 					a_t_Reg = a_t_Reg + m_t_Reg;
 					m_t_Reg = m_t_Reg;
 					q_t_Reg = q_t_Reg;

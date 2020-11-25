@@ -1,13 +1,9 @@
 //`include "_parameter.v"
 
 // Parameters for reference
-`define DATA_WIDTH 32
+`define DATA_WIDTH 32 //used
 `define ADDR_WIDTH 5
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH)
-`define TOTAL_BITS `DATA_WIDTH * `TOTAL_ADDR
-`define DATA_WIDTH32 32
-`define ADDR_WIDTH32 7
-`define TOTAL_ADDR32 (2 ** `ADDR_WIDTH32)
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
 `define DATA_LENGTH 1024
 
 module MonPro
@@ -24,59 +20,79 @@ module MonPro
 	output reg [`DATA_WIDTH - 1 : 0] res_out
 );
 
-integer i,j,k,k_e1,k_e2;
+/***********************************************************************************************************************************************/
+/***********************************************************************************************************************************************/
+/*****************************************************Variable Initializations******************************************************************/
+/***********************************************************************************************************************************************/
+/***********************************************************************************************************************************************/
 
-//Variable initializations
-reg start_secondary;
-wire startTransfer;
-//input
-reg [`DATA_WIDTH - 1 : 0] m [`DATA_WIDTH - 1 : 0];
-reg [`DATA_WIDTH - 1 : 0] e [`DATA_WIDTH - 1 : 0];
-reg [`DATA_WIDTH - 1 : 0] n [`TOTAL_ADDR - 1 : 0];
-reg [`DATA_LENGTH - 1 : 0] n_full;
+										/******************************/
+										/*********** Inputs ***********/
+										/******************************/
 
-//secondary constants
-reg [`DATA_WIDTH - 1 : 0] n0prime;
-reg [`DATA_WIDTH - 1 : 0] r [`DATA_WIDTH - 1 : 0];
-reg [`DATA_WIDTH - 1 : 0] t [`DATA_WIDTH - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] m [`DATA_WIDTH - 1 : 0]; // for m_input 
+								reg [`DATA_WIDTH - 1 : 0] e [`DATA_WIDTH - 1 : 0]; // for e_input
+								reg [`DATA_WIDTH - 1 : 0] n [`TOTAL_ADDR - 1 : 0]; //for n input -- need n_full also for secondary constants
+								reg [`DATA_LENGTH - 1 : 0] n_full;
 
-//used in monpro algorithm
-reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
-reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
-reg [5 : 0] count_input = 6'd0;
+										/******************************/
+										/*****secondary constants *****/
+										/******************************/
+
+								reg [`DATA_WIDTH - 1 : 0] n0prime;					
+								reg [`DATA_WIDTH - 1 : 0] r [`DATA_WIDTH - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] t [`DATA_WIDTH - 1 : 0];
+								wire [31:0] r_out;	 //
+								wire [31:0] t_out;	 //  _out variables are for receiving parts of r/t.
+								wire [31:0] n0p_out; //
+
+										/******************************/
+										/***** Multiply-Add Block *****/
+										/******************************/
+
+								reg [`DATA_WIDTH - 1 : 0] carry; // "z" in example code, seemed simpler to call it carry bc it's assigned the carry bit
+								reg [`DATA_WIDTH - 1 : 0] v [`DATA_WIDTH + 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] m_multiply_add; // m in original
+								reg [`DATA_WIDTH - 1 : 0] x0;
+								reg [`DATA_WIDTH - 1 : 0] y0;
+								reg [`DATA_WIDTH - 1 : 0] z0;
+								reg [`DATA_WIDTH - 1 : 0] last_c0;
+								wire [`DATA_WIDTH - 1 : 0] s0;
+								wire [`DATA_WIDTH - 1 : 0] c0;
+
+										/******************************/
+										/*****Used in MonPro Algo *****/
+										/******************************/
+
+								reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
+								reg [5 : 0] count_input = 6'd0;
+								reg start_secondary;
+								wire startTransfer;
+								integer i, j, k, k_e1, k_e2;
+								parameter S0 = 0, S1 = 1, S2 = 2, S3 = 3, S4 = 4, S5 = 5, S6 = 6, S7 = 7; // Multiply-Add block states
+								parameter INIT_STATE = 0, LOAD_M_E_N = 1, LOAD_N = 2, COMPUTE_SECONDARY_INPUTS = 3;
+								parameter WAIT_COMPUTE_SECONDARY_INPUTS = 4,CATCH_SECONDARY_INPUTS = 5, CALC_M_BAR = 6;
+								parameter GET_K_E = 7, BIGLOOP = 8, CALC_C_BAR_M_BAR = 9, CALC_C_BAR_1 = 10, COMPLETE = 11, OUTPUT_RESULT = 12, TERMINAL = 13;
 
 
-// multiply add block components
-reg [`DATA_WIDTH - 1 : 0] carry; // "z" in example code, seemed simpler to call it carry bc it's assigned the carry bit
-reg [`DATA_WIDTH - 1 : 0] v [`DATA_WIDTH + 1 : 0];
-reg [`DATA_WIDTH - 1 : 0] m_multiply_add;
 
-
-//States for multiply add block component
-parameter S0 = 0, S1 = 1, S2 = 2, S3 = 3, S4 = 4, S5 = 5, S6 = 6, S7 = 7;
-//States for MonPro
-parameter INIT_STATE = 0, LOAD_M_E_N = 1, LOAD_N = 2, COMPUTE_SECONDARY_INPUTS = 3, WAIT_COMPUTE_SECONDARY_INPUTS = 4,CATCH_SECONDARY_INPUTS = 5, CALC_M_BAR = 6;
-parameter GET_K_E = 7, BIGLOOP = 8, CALC_C_BAR_M_BAR = 9, CALC_C_BAR_1 = 10, COMPLETE = 11, OUTPUT_RESULT = 12, TERMINAL = 13;
-
-//multiply add block components
-reg [`DATA_WIDTH - 1 : 0] x0;
-reg [`DATA_WIDTH - 1 : 0] y0;
-reg [`DATA_WIDTH - 1 : 0] z0;
-reg [`DATA_WIDTH - 1 : 0] last_c0;
-wire [`DATA_WIDTH - 1 : 0] s0;
-wire [`DATA_WIDTH - 1 : 0] c0;
-
-//r_out t_out
-wire [31:0] r_out;
-wire [31:0] t_out;
-wire [31:0] n0p_out;
-//secondary constant components if necessary
-
-
-// Instantiations
+										/******************************/
+										/******* Instantiations *******/
+										/******************************/
 
 MultiplyAdd m0 (.clk(clk),.x(x0),.y(y0),.z(z0),.cin(last_c0),.s(s0),.cout(c0));
 secondaryInputTop sip0 (.start(start_secondary), .clk(clk), .n(n_full), .n0p(n0p_out), .r(r_out), .t(t_out), .done(secondary_input_done), .startTransfer(startTransfer));
+
+	/********************************************************************************************************************************************************/
+	/*	Different from Original: 																															*/
+	/*								z -> carry																												*/
+	/*								m -> m_multiply_add																										*/
+	/*								Timer for receiving inputs -> count_input 																				*/
+	/*								all parts for secondary constants since we receive it differently 														*/
+	/*								m_in e_in t_in r_in n_in -> without the _in 																			*/
+	/*								nprime0 -> n0p_out and n0prime 																							*/
+	/********************************************************************************************************************************************************/
 
 initial begin
 
@@ -142,7 +158,7 @@ begin
 				m[count_input] = m_input;
 				e[count_input] = e_input;
 				n[count_input] = n_input;
-				n_full = {n_full[991:0],n_input};
+				n_full = {n_input, n_full[`DATA_LENGTH - 1 : `DATA_WIDTH]};
 				count_input = count_input + 1;
 			end
 			else begin

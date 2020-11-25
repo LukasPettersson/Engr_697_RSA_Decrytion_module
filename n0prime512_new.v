@@ -4,9 +4,9 @@
 `define DATA_LENGTH 1024
 
 module n0prime(
-							input [1023:0] n,
+							input [`DATA_LENGTH - 1 : 0] n,
 							input start, clk,
-							output[31:0] n0prime,
+							output[`DATA_WIDTH - 1 : 0] n0prime,
 							output reg done);
 	/*
 		n0prime = -n^-1mod(2^w)
@@ -16,15 +16,15 @@ module n0prime(
 
 		!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	*/
-reg [1024:0] t,qinv;
-reg [1024:0] temp1, temp2;
-reg [1024:0] w_const = 1024'h100000000;
-reg [1024:0] b1, b2;
-wire [1024:0] b;
+reg [`DATA_LENGTH : 0] t,qinv;
+reg [`DATA_LENGTH : 0] temp1, temp2;
+reg [`DATA_LENGTH : 0] w_const = 1024'h100000000;
+reg [`DATA_LENGTH : 0] b1, b2;
+wire [`DATA_LENGTH : 0] b;
 reg [2:0] state = 5;
 reg divStart;
 wire divDone;
-wire [1024:0] Q_out, rem;
+wire [`DATA_LENGTH : 0] Q_out, rem;
 
 assign n0prime = -qinv;
 
@@ -91,9 +91,9 @@ always@ (posedge clk) begin
 					begin
 						t = b1+w_const;
 						if(t>w_const)
-							qinv = b1[31:0];
+							qinv = b1[`DATA_WIDTH - 1 : 0];
 						else
-							qinv = t[31:0];
+							qinv = t[`DATA_WIDTH - 1 : 0];
 						end
 						done = 1;
 						state = 5;
