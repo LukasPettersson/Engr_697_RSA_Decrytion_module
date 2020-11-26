@@ -1,6 +1,6 @@
 `define DATA_WIDTH 32 //used
 `define ADDR_WIDTH 5
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
 `define DATA_LENGTH 1024
 
 module secondaryInputTop( input start, clk,
@@ -81,18 +81,19 @@ always@ (posedge clk) begin
   end
 
   3: begin
-    if(count <= `DATA_WIDTH) begin
-      r = r_reg[`DATA_LENGTH - 1 : (`DATA_LENGTH - 1) - `DATA_WIDTH - 1];
-      r_reg = {r_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0};
+        if(count <= `DATA_WIDTH) begin
+          r = r_reg[(`DATA_LENGTH - 1) : (`DATA_LENGTH - `DATA_WIDTH )];    // r = r_reg[1023 : 992]
 
-      t = t_reg[`DATA_LENGTH - 1 : (`DATA_LENGTH - 1) - `DATA_WIDTH - 1];
-      t_reg = {t_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0};
-      count = count +1;
-    end
-    else begin
-      done = 1;
-    end
-  end
+          r_reg = {r_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0}; //r_reg {r_reg[991 : 0], 32'b0}
+
+          t = t_reg[(`DATA_LENGTH - 1) : (`DATA_LENGTH - `DATA_WIDTH )];
+          t_reg = {t_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0};
+          count = count +1;
+        end
+        else begin
+          done = 1;
+        end
+      end
   endcase
 end
 endmodule
