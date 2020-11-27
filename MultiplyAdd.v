@@ -1,7 +1,7 @@
-`define DATA_WIDTH 32 //used
-`define ADDR_WIDTH 5
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
-`define DATA_LENGTH 1024
+`define DATA_WIDTH 64 //used
+`define ADDR_WIDTH 6
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
+`define DATA_LENGTH 4096
 
 module MultiplyAdd
 (

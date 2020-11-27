@@ -1,10 +1,10 @@
 //`include "_parameter.v"
 
 // Parameters for reference
-`define DATA_WIDTH 32 //used
-`define ADDR_WIDTH 5
+`define DATA_WIDTH 64 //used
+`define ADDR_WIDTH 6
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 1024
+`define DATA_LENGTH 4096
 
 module MonPro
 (
@@ -42,9 +42,9 @@ module MonPro
 								reg [`DATA_WIDTH - 1 : 0] n0prime;
 								reg [`DATA_WIDTH - 1 : 0] r [`DATA_WIDTH - 1 : 0];
 								reg [`DATA_WIDTH - 1 : 0] t [`DATA_WIDTH - 1 : 0];
-								wire [31:0] r_out;	 //
-								wire [31:0] t_out;	 //  _out variables are for receiving parts of r/t.
-								wire [31:0] n0p_out; //
+								wire [`DATA_WIDTH - 1 : 0] r_out;	 //
+								wire [`DATA_WIDTH - 1 : 0] t_out;	 //  _out variables are for receiving parts of r/t.
+								wire [`DATA_WIDTH - 1 : 0] n0p_out; //
 
 										/******************************/
 										/***** Multiply-Add Block *****/
@@ -66,7 +66,7 @@ module MonPro
 
 								reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
 								reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
-								reg [5 : 0] count_input = 6'd0;
+								reg [`ADDR_WIDTH : 0] count_input = 7'd0;
 								reg start_secondary;
 								wire startTransfer;
 								integer i, j, k, k_e1, k_e2;
@@ -97,15 +97,15 @@ secondaryInputTop sip0 (.start(start_secondary), .clk(clk), .n(n_full), .n0p(n0p
 initial begin
 
 	for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
-		v[i] = 32'h00000000;
+		v[i] = 64'h0000000000000000;
 	end
 	for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
-		m[i] = 32'h00000000;
-		e[i] = 32'h00000000;
+		m[i] = 64'h0000000000000000;
+		e[i] = 64'h0000000000000000;
 	end
-	res_out = 32'h00000000;
+	res_out = 64'h0000000000000000;
 
-	carry = 32'h00000000;	// initial C = 0
+	carry = 64'h0000000000000000;	// initial C = 0
 	i = 0;
 	j = 0;
 	k = 0;
@@ -123,15 +123,15 @@ always @ (posedge clk or posedge reset)
 begin
 	if (reset) begin
 		for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
-			v[i] = 32'h00000000;
+			v[i] = 64'h0000000000000000;
 		end
 		for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
-			m[i] = 32'h00000000;
-			e[i] = 32'h00000000;
+			m[i] = 64'h0000000000000000;
+			e[i] = 64'h0000000000000000;
 		end
 
-		res_out = 32'h00000000;
-		carry = 32'h00000000;	// initial C = 0
+		res_out = 64'h0000000000000000;
+		carry = 64'h0000000000000000;	// initial C = 0
 		i = 0;
 		j = 0;
 		k = 0;
@@ -213,8 +213,8 @@ begin
 				end //end of S0
 				S1: begin
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -231,8 +231,8 @@ begin
 					if(k == 0) begin
 						x0 <=v[0];
 						y0 <= n0prime;
-						z0 <= 32'h00000000;
-						last_c0 <= 32'h00000000;
+						z0 <= 64'h0000000000000000;
+						last_c0 <= 64'h0000000000000000;
 						k = 1;
 					end //end if(k == 0)
 					else if(k == 1) begin
@@ -248,7 +248,7 @@ begin
 								x0 <= m_multiply_add;
 								y0 <= n[0];
 								z0 <= v[0];
-								last_c0 <= 32'h00000000;
+								last_c0 <= 64'h0000000000000000;
 								k = 1;
 							end
 							else if(k == 1) begin
@@ -280,8 +280,8 @@ begin
 				S4:
 				begin
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -296,8 +296,8 @@ begin
 				S5:
 				begin
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR + 1];
 						last_c0 <= carry;
 						k = 1;
@@ -325,9 +325,9 @@ begin
 						c_bar[i] = r[i];
 					end
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
-						v[i] = 32'h00000000;
+						v[i] = 64'h0000000000000000;
 					end
-					carry = 32'h00000000;
+					carry = 64'h0000000000000000;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -386,8 +386,8 @@ begin
 				S1:
 				begin
 					if(k == 0) begin	// first clock: initial input
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -404,8 +404,8 @@ begin
 					if(k == 0) begin	// first clock: initial input
 						x0 <= v[0];
 						y0 <= n0prime;
-						z0 <= 32'h00000000;
-						last_c0 <= 32'h00000000;
+						z0 <= 64'h0000000000000000;
+						last_c0 <= 64'h0000000000000000;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -421,7 +421,7 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[0];
 							z0 <= v[0];
-							last_c0 <= 32'h00000000;
+							last_c0 <= 64'h0000000000000000;
 							k = 1;
 						end
 						else if(k == 1) begin
@@ -453,8 +453,8 @@ begin
 				S4:
 				begin
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -469,8 +469,8 @@ begin
 				S5:
 				begin
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR + 1];
 						last_c0 <= carry;
 						k = 1;
@@ -495,9 +495,9 @@ begin
 						c_bar[i] = v[i];
 					end
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
-						v[i] = 32'h00000000;
+						v[i] = 64'h0000000000000000;
 					end
-					carry = 32'h00000000;
+					carry = 64'h0000000000000000;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -553,8 +553,8 @@ begin
 				S1:
 				begin // (C, S) = v[s] + C, v[s] = S, v[s + 1] = C
 					if(k == 0) begin	// first clock: initial input
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -572,8 +572,8 @@ begin
 					if(k == 0) begin	// first clock: initial input
 						x0 <= v[0];
 						y0 <= n0prime;
-						z0 <= 32'h00000000;
-						last_c0 <= 32'h00000000;
+						z0 <= 64'h0000000000000000;
+						last_c0 <= 64'h0000000000000000;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -591,7 +591,7 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[0];
 							z0 <= v[0];
-							last_c0 <= 32'h00000000;
+							last_c0 <= 64'h0000000000000000;
 							k = 1;
 						end
 						else if(k == 1) begin
@@ -624,8 +624,8 @@ begin
 				S4:
 				begin //	(C, S) = v[s] + C, v[s - 1] = S
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -641,8 +641,8 @@ begin
 				S5:
 				begin // v[s] = v[s + 1] + C
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR + 1];
 						last_c0 <= carry;
 						k = 1;
@@ -668,9 +668,9 @@ begin
 						c_bar[i] = v[i];
 					end
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
-						v[i] = 32'h00000000;
+						v[i] = 64'h0000000000000000;
 					end
-					carry = 32'h00000000;
+					carry = 64'h0000000000000000;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -705,7 +705,7 @@ begin
 					if(i == 0) begin
 						if(k == 0) begin	// first clock: initial input
 							// initial a new multiplier computation
-							x0 <= 32'h00000001;
+							x0 <= 64'h0000000000000001;
 							y0 <= c_bar[j];
 							z0 <= v[j];
 							last_c0 <= carry;
@@ -726,7 +726,7 @@ begin
 					else begin
 						if(k == 0) begin	// first clock: initial input
 							// initial a new multiplier computation
-							x0 <= 32'h00000000;
+							x0 <= 64'h0000000000000000;
 							y0 <= c_bar[j];
 							z0 <= v[j];
 							last_c0 <= carry;
@@ -749,8 +749,8 @@ begin
 				S1:
 				begin // (C, S) = v[s] + C, v[s] = S, v[s + 1] = C
 					if(k == 0) begin	// first clock: initial input
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -768,8 +768,8 @@ begin
 					if(k == 0) begin	// first clock: initial input
 						x0 <= v[0];
 						y0 <= n0prime;
-						z0 <= 32'h00000000;
-						last_c0 <= 32'h00000000;
+						z0 <= 64'h0000000000000000;
+						last_c0 <= 64'h0000000000000000;
 						k = 1;
 					end
 					else if(k == 1) begin
@@ -787,7 +787,7 @@ begin
 							x0 <= m_multiply_add;
 							y0 <= n[0];
 							z0 <= v[0];
-							last_c0 <= 32'h00000000;
+							last_c0 <= 64'h0000000000000000;
 							k = 1;
 						end
 						else if(k == 1) begin
@@ -820,8 +820,8 @@ begin
 				S4:
 				begin //	(C, S) = v[s] + C, v[s - 1] = S
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR];
 						last_c0 <= carry;
 						k = 1;
@@ -837,8 +837,8 @@ begin
 				S5:
 				begin // v[s] = v[s + 1] + C
 					if(k == 0) begin
-						x0 <= 32'h00000000;
-						y0 <= 32'h00000000;
+						x0 <= 64'h0000000000000000;
+						y0 <= 64'h0000000000000000;
 						z0 <= v[`TOTAL_ADDR + 1];
 						last_c0 <= carry;
 						k = 1;
@@ -866,7 +866,7 @@ begin
 					for(i = 0; i < `TOTAL_ADDR + 2; i = i + 1) begin
 						v[i] = 0;
 					end
-					carry = 32'h00000000;
+					carry = 64'h0000000000000000;
 					i = 0;
 					j = 0;
 					k = 0;
@@ -894,12 +894,12 @@ begin
 			else begin
 				exp_state = TERMINAL;
 				i = 0;
-				res_out = 32'h00000000;
+				res_out = 64'h0000000000000000;
 			end
 		end
 		TERMINAL:
 		begin
-			res_out = 32'h00000000;
+			res_out = 64'h0000000000000000;
 		end
 	endcase
 end

@@ -1,7 +1,7 @@
-`define DATA_WIDTH 32 //used
-`define ADDR_WIDTH 5
+`define DATA_WIDTH 64 //used
+`define ADDR_WIDTH 6
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 1024
+`define DATA_LENGTH 4096
 
 
 module MonPro_tb();
@@ -10,7 +10,7 @@ module MonPro_tb();
 reg clk,reset, startInput, getResults;
 reg [3:0] state;
 reg [4:0] exp_state;
-wire [31 : 0] res_out;
+wire [`DATA_WIDTH - 1: 0] res_out;
 reg [`DATA_WIDTH - 1 : 0] m_input, e_input, n_input;
 MonPro mp(.clk(clk),
           .reset(),
@@ -39,135 +39,263 @@ begin
   clk = 0;
   #50
   startInput = 1;
-  #100
-  n_input = 32'h8B9496E5;
-m_input = 32'h00000005;
-e_input = 32'h00010001;
 #100
-n_input = 32'h5F06287C;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h95d1805142cb6d1d;
+e_input = 64'h0000000000000005;
+n_input = 64'h1622bd795fec898f;
 #100
-n_input = 32'h31988514;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h2aa50f4ec6f00933;
+e_input = 64'h0000000000000000;
+n_input = 64'ha9ec0806705fca16;
 #100
-n_input = 32'hF96F9A0B;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h31234efe6e648043;
+e_input = 64'h0000000000000000;
+n_input = 64'h1ba1621582283d15;
 #100
-n_input = 32'h098EC99C;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h1d7173e55bc7fdeb;
+e_input = 64'h0000000000000000;
+n_input = 64'h29e821a4c74803e3;
 #100
-n_input = 32'hCE60DEFE;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hd26d53961058fe8c;
+e_input = 64'h0000000000000000;
+n_input = 64'hd707107e855c3844;
 #100
-n_input = 32'h7B044519;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hda54f267dd138266;
+e_input = 64'h0000000000000000;
+n_input = 64'h5eda92d864ac5db9;
 #100
-n_input = 32'h197CBC98;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h07120911b3b68b57;
+e_input = 64'h0000000000000000;
+n_input = 64'hbb968a437d5c8dfc;
 #100
-n_input = 32'h8C547944;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h869bdbd2e72bb5b7;
+e_input = 64'h0000000000000000;
+n_input = 64'h78255d6807923986;
 #100
-n_input = 32'h528B17F6;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hc09fcd8f739cd488;
+e_input = 64'h0000000000000000;
+n_input = 64'h4efbc8d60b21fbac;
 #100
-n_input = 32'h024D981B;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h33a1d1c2ad4ab155;
+e_input = 64'h0000000000000000;
+n_input = 64'hd92a4aa2b410d93c;
 #100
-n_input = 32'h9397F02E;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h7f411fed1e70e799;
+e_input = 64'h0000000000000000;
+n_input = 64'h9d643c25fbb230bb;
 #100
-n_input = 32'h13F7DBF4;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h41a8a6e165e04993;
+e_input = 64'h0000000000000000;
+n_input = 64'h9403560d97dae38d;
 #100
-n_input = 32'h65D03E3B;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'ha41865bf350d278d;
+e_input = 64'h0000000000000000;
+n_input = 64'ha5ac06d864c2f2e3;
 #100
-n_input = 32'hE3DA97CB;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hff3e0ba10ac728b4;
+e_input = 64'h0000000000000000;
+n_input = 64'h2b28fef02b9c014e;
 #100
-n_input = 32'hE728F169;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hcc249558f2ad985f;
+e_input = 64'h0000000000000000;
+n_input = 64'h3a1890c78092b4d4;
 #100
-n_input = 32'hA0FA5221;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h9f9821883744da64;
+e_input = 64'h0000000000000000;
+n_input = 64'h0326324dfb695ffb;
 #100
-n_input = 32'h6FB2A652;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h1ac902ee25777cf0;
+e_input = 64'h0000000000000000;
+n_input = 64'h33138131c541013d;
 #100
-n_input = 32'h4F8EA1A0;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h755a3ac132ae2a20;
+e_input = 64'h0000000000000000;
+n_input = 64'heb8ac8ce8a245e6b;
 #100
-n_input = 32'h5ABE53AE;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h5c94938160c6b3ed;
+e_input = 64'h0000000000000000;
+n_input = 64'h8c5fe8f8dc3bf364;
 #100
-n_input = 32'h12A3EAD3;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hd3b564b08be04c3e;
+e_input = 64'h0000000000000000;
+n_input = 64'h678a5aa33b6fe507;
 #100
-n_input = 32'h8C4CB074;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h1ad0a6f226bdd974;
+e_input = 64'h0000000000000000;
+n_input = 64'h5804f92283868a29;
 #100
-n_input = 32'h1487CE4E;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h98a33736fd1ac7ce;
+e_input = 64'h0000000000000000;
+n_input = 64'hd8f33418f3d4e711;
 #100
-n_input = 32'h5BC6D48D;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h7ce71b48fba52e59;
+e_input = 64'h0000000000000000;
+n_input = 64'h5a702cfa93ea5c4e;
 #100
-n_input = 32'h2F604851;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h905c053b25fdacbe;
+e_input = 64'h0000000000000000;
+n_input = 64'he8e5b4617589a82b;
 #100
-n_input = 32'h2C34DF98;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'ha36bcb0167e98363;
+e_input = 64'h0000000000000000;
+n_input = 64'ha8c24d4244ef7feb;
 #100
-n_input = 32'h0AD14479;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h6c596216ae0fdbc8;
+e_input = 64'h0000000000000000;
+n_input = 64'h9be3cecb8c497c68;
 #100
-n_input = 32'hC1526B25;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'h856f3d95e0ae1a1b;
+e_input = 64'h0000000000000000;
+n_input = 64'hbab9f87ff5059285;
 #100
-n_input = 32'h0357F18C;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hade7cef37ed2ec2f;
+e_input = 64'h0000000000000000;
+n_input = 64'h62397bc701762741;
 #100
-n_input = 32'hD18C0F37;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'he345ac72eac39204;
+e_input = 64'h0000000000000000;
+n_input = 64'hdb610487c89da11b;
 #100
-n_input = 32'hA346920B;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
+m_input = 64'hd5627386528cc241;
+e_input = 64'h0000000000000000;
+n_input = 64'hf463b337d20b5d59;
 #100
-n_input = 32'hA938A368;
-m_input = 32'h00000000;
-e_input = 32'h00000000;
-#100; 
+m_input = 64'hff88ec827f99d273;
+e_input = 64'h0000000000000000;
+n_input = 64'hf03edca7e2dcaa37;
+#100
+m_input = 64'ha2939b3b7fa74d8a;
+e_input = 64'h0000000000000000;
+n_input = 64'h83333218bd91a1b7;
+#100
+m_input = 64'hdfec4623ab899605;
+e_input = 64'h0000000000000000;
+n_input = 64'h21167d8fcf23cae8;
+#100
+m_input = 64'h8af5890333b5b3ce;
+e_input = 64'h0000000000000000;
+n_input = 64'hc703806984c81999;
+#100
+m_input = 64'hee6a8e2f9c19ed34;
+e_input = 64'h0000000000000000;
+n_input = 64'h349aae908fb5262c;
+#100
+m_input = 64'h027c013f38018399;
+e_input = 64'h0000000000000000;
+n_input = 64'hf320cd576d14475b;
+#100
+m_input = 64'hb4a1ca795718ada2;
+e_input = 64'h0000000000000000;
+n_input = 64'h7b297d0b0e5e18ba;
+#100
+m_input = 64'hbf3df0bbf66ac168;
+e_input = 64'h0000000000000000;
+n_input = 64'h5d5f576cdeb8fc4c;
+#100
+m_input = 64'h51797350e6256403;
+e_input = 64'h0000000000000000;
+n_input = 64'h8ded3c9691eb79fa;
+#100
+m_input = 64'h52631db9d17034ce;
+e_input = 64'h0000000000000000;
+n_input = 64'hf0e642f43328ad08;
+#100
+m_input = 64'h866d7002091472ad;
+e_input = 64'h0000000000000000;
+n_input = 64'h69d495dd81355c53;
+#100
+m_input = 64'hdfde228125fb5f3d;
+e_input = 64'h0000000000000000;
+n_input = 64'hd037cdff7c240d49;
+#100
+m_input = 64'h9a431f7a41c30359;
+e_input = 64'h0000000000000000;
+n_input = 64'h6a17b9af5b569643;
+#100
+m_input = 64'h27e969e2c8bf23fb;
+e_input = 64'h0000000000000000;
+n_input = 64'h0067dba858989008;
+#100
+m_input = 64'h61067a8cd7a3283c;
+e_input = 64'h0000000000000000;
+n_input = 64'h8a449ebe89d9bf02;
+#100
+m_input = 64'h4b5ca436953c178e;
+e_input = 64'h0000000000000000;
+n_input = 64'hc9546b439f9d0129;
+#100
+m_input = 64'hb4d4dfccb7d779cc;
+e_input = 64'h0000000000000000;
+n_input = 64'h54c56c9a9cc9af4e;
+#100
+m_input = 64'h786e30efce9b2e70;
+e_input = 64'h0000000000000000;
+n_input = 64'h99901c0475491bc3;
+#100
+m_input = 64'hccc93ff710fce97d;
+e_input = 64'h0000000000000000;
+n_input = 64'hcdf8440407295e42;
+#100
+m_input = 64'h843b2a7d15ab2c21;
+e_input = 64'h0000000000000000;
+n_input = 64'ha2a7ae1f3ac7652c;
+#100
+m_input = 64'hea5f24b6de6fec4b;
+e_input = 64'h0000000000000000;
+n_input = 64'h8cfe5cd12d5db79b;
+#100
+m_input = 64'h10fc9eee0a1727f7;
+e_input = 64'h0000000000000000;
+n_input = 64'h2e47dc0e959f3a51;
+#100
+m_input = 64'h21681081399f8a8f;
+e_input = 64'h0000000000000000;
+n_input = 64'h1773308cdc6b13ab;
+#100
+m_input = 64'h4cea2df00a66dc4e;
+e_input = 64'h0000000000000000;
+n_input = 64'h8d103ed3cc667e97;
+#100
+m_input = 64'hc2472fd603e9ba02;
+e_input = 64'h0000000000000000;
+n_input = 64'hd9ed17e3cc0e95ee;
+#100
+m_input = 64'h72d6bc20d80d6a1c;
+e_input = 64'h0000000000000000;
+n_input = 64'hee52bdb6d1020a15;
+#100
+m_input = 64'hdca5b35354a1d505;
+e_input = 64'h0000000000000000;
+n_input = 64'h084f3dd6415af341;
+#100
+m_input = 64'hccf719ab2922fbd8;
+e_input = 64'h0000000000000000;
+n_input = 64'hf18dd1eed77c96c0;
+#100
+m_input = 64'hde62d43f261908b9;
+e_input = 64'h0000000000000000;
+n_input = 64'h12093d26ac512b01;
+#100
+m_input = 64'h75f2bc20a7f5195c;
+e_input = 64'h0000000000000000;
+n_input = 64'hde3a5db5154ed512;
+#100
+m_input = 64'h5f0ef320f7f60e7f;
+e_input = 64'h0000000000000000;
+n_input = 64'h73f7ba8e0445d656;
+#100
+m_input = 64'h61d9fe398147a8f4;
+e_input = 64'h0000000000000000;
+n_input = 64'hc10faa4003ba33db;
+#100
+m_input = 64'h87a1798fe6addd9e;
+e_input = 64'h0000000000000000;
+n_input = 64'h47fc816ac16e2284;
+#100
+m_input = 64'h044d9850809f2923;
+e_input = 64'h0000000000000000;
+n_input = 64'h84c5b4763fe31d03;
+#100;
 end
 
 endmodule

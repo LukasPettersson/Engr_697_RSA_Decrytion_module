@@ -1,7 +1,7 @@
-`define DATA_WIDTH 32 //used
-`define ADDR_WIDTH 5
+`define DATA_WIDTH 64 //used
+`define ADDR_WIDTH 6
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 1024
+`define DATA_LENGTH 4096
 
 module secondaryInputTop( input start, clk,
                           input [`DATA_LENGTH - 1 : 0] n,
@@ -19,9 +19,9 @@ t:
 reg startCompute;
 reg n0prime_flag, r_t_flag;
 reg [`DATA_LENGTH - 1 : 0] r_reg, t_reg;
-wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire;
+wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire; // [4095 : 0]
 reg [1:0] state;
-reg [6:0] count;
+reg [`ADDR_WIDTH:0] count;
 constant_r_t_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
                         .start(start),
@@ -84,10 +84,10 @@ always@ (posedge clk) begin
         if(count <= `DATA_WIDTH) begin
           r = r_reg[(`DATA_LENGTH - 1) : (`DATA_LENGTH - `DATA_WIDTH )];    // r = r_reg[1023 : 992]
 
-          r_reg = {r_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0}; //r_reg {r_reg[991 : 0], 32'b0}
+          r_reg = {r_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],64'b0}; //r_reg {r_reg[991 : 0], 32'b0}
 
           t = t_reg[(`DATA_LENGTH - 1) : (`DATA_LENGTH - `DATA_WIDTH )];
-          t_reg = {t_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],32'b0};
+          t_reg = {t_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],64'b0};
           count = count +1;
         end
         else begin
