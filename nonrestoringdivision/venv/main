@@ -1,0 +1,164 @@
+# Python program to divide two
+# unsigned integers using
+# Non-Restoring Division Algorithm
+
+# Function to add two binary numbers
+def add(A, M):
+    carry = 0
+    Sum = ''
+
+    # Iterating through the number
+    # A. Here, it is assumed that
+    # the length of both the numbers
+    # is same
+    for i in range(len(A) - 1, -1, -1):
+
+        # Adding the values at both
+        # the indices along with the
+        # carry
+        temp = int(A[i]) + int(M[i]) + carry
+
+        # If the binary number exceeds 1
+        if (temp > 1):
+            Sum += str(temp % 2)
+            carry = 1
+        else:
+            Sum += str(temp)
+            carry = 0
+
+    # Returning the sum from
+    # MSB to LSB
+    return Sum[::-1]
+
+    # Function to find the compliment
+
+
+# of the given binary number
+def compliment(m):
+    M = ''
+
+    # Iterating through the number
+    for i in range(0, len(m)):
+        # Computing the compliment
+        M += str((int(m[i]) + 1) % 2)
+
+        # Adding 1 to the computed
+    # value
+    M = add(M, '00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001')
+    return M
+
+    # Function to find the quotient
+
+
+# and remainder using the
+# Non-Restoring Division Algorithm
+def nonRestoringDivision(Q, M, A):
+    # Computing the length of the
+    # number
+    count = len(M)
+    print("lenght of M: ", len(M))
+    comp_M = compliment(M)
+    print(comp_M)
+    # Variable to determine whether
+    # addition or subtraction has
+    # to be computed for the next step
+    flag = 'successful'
+
+    # Printing the initial values
+    # of the accumulator, dividend
+    # and divisor
+    print('Initial Values: A:', A,
+          ' Q:', Q, ' M:', M)
+
+    # The number of steps is equal to the
+    # length of the binary number
+    while (count):
+
+        # Printing the values at every step
+        print("\nstep:", len(M) - count + 1,
+              end='')
+
+        # Step1: Left Shift, assigning LSB of Q
+        # to MSB of A.
+        print(' Left Shift and ', end='')
+        A = A[1:] + Q[0]
+        print('count: ', count);
+        # Choosing the addition
+        # or subtraction based on the
+        # result of the previous step
+        if (flag == 'successful'):
+            print('comp_M len: ', len(comp_M))
+            print('A len', len(A))
+            A = add(A, comp_M)
+            print('subtract: ')
+        else:
+            A = add(A, M)
+            print('Addition: ')
+
+        print('A:', A, ' Q:',
+              Q[1:] + '_', end='')
+
+        if (A[0] == '1'):
+
+            # Step is unsuccessful and the
+            # quotient bit will be '0'
+            Q = Q[1:] + '0'
+            print('  -Unsuccessful')
+
+            flag = 'unsuccessful'
+            print('A:', A, ' Q:', Q,
+                  ' -Addition in next Step')
+
+        else:
+
+            # Step is successful and the quotient
+            # bit will be '1'
+            Q = Q[1:] + '1'
+            print('  Successful')
+
+            flag = 'successful'
+            print('A:', A, ' Q:', Q,
+                  ' -Subtraction in next step')
+        count -= 1
+    print('\nQuotient(Q):', Q,
+          ' \nRemainder(A):', A,
+          )
+
+    if(A[0] == '1'):
+        A = add(A,M)
+        print('new ramainder: ', A)
+    else:
+        print(A)
+    # Driver code
+
+
+if __name__ == "__main__":
+    dividend = '11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111110001110100110011101011001110011000010001011010000011000001011011111100111001000101010111111001111011001011000111111111111111111111111111111111' # 542 0000000000000000000000
+    divisor = '11011101110100100111011100010000100100111111111011110000110110111011010100110010110110110001110100101001101111101110101001111110001010101000001110011011010000110111111010001100000100011010000101010100001111101101111011111110101101000011101100111011000100111001011010110011110011111111011011011101010001100'  # 43
+    dividendlen = len(dividend)
+    divisorlen = len(divisor)
+    diff = dividendlen - divisorlen
+    i = 0;
+    newdivisor = ''
+    print(diff)
+    for count in range(0,diff):
+        newdivisor = newdivisor + '0'
+
+    newdivisor = newdivisor + divisor
+
+    if len(newdivisor) == len(dividend):
+        print(':)')
+    else:
+        print(':(')
+
+    print('newdivisor: ',newdivisor)
+    # (Q - dividend, M - divisor, A - accumulator)
+    accumulator = '0' * len(dividend)
+    print("A: " +accumulator)
+    print ("Q: " + dividend)
+    print ("M: " + divisor)
+    nonRestoringDivision(dividend,
+                         newdivisor,
+                         accumulator)
+
+
