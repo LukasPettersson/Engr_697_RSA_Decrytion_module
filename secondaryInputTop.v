@@ -35,17 +35,14 @@ n0prime n0(   .n(n),
               .clk(clk),
               .done(n0prime_done));
 
-
-always@ (posedge clk) begin
-  done = 0;
-  if(start) begin
-    r_t_flag = 0;
-    n0prime_flag = 0;
-    count = 0;
-    startTransfer = 0;
-    state = 0;
-  end
+initial begin
+		r_t_flag = 0;
+		n0prime_flag = 0;
+		count = 0;
+		startTransfer = 0;
+		state = 4;
 end
+
 //janky?
 always@ (posedge clk) begin
   if(n0prime_done) begin
@@ -58,7 +55,10 @@ always@ (posedge clk) begin
   end
 end
 always@ (posedge clk) begin
-
+	
+	if (start) begin
+		state = 0;
+	end
   case(state)
 
   0: begin
@@ -94,6 +94,9 @@ always@ (posedge clk) begin
           done = 1;
         end
       end
+		4:begin //idle state
+		
+		end
   endcase
 end
 endmodule

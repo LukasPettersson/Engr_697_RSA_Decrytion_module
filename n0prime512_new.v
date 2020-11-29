@@ -38,12 +38,12 @@ nonrestoringdiv div(
 										.done(divDone)
 									);
 
-always@ (posedge clk) begin
-if(start)
-		state = 0;
-end
+
 assign b = b2 - Q_out*b1;
 always@ (posedge clk) begin
+		if(start) begin
+			state = 0;
+		end
 		case(state)
 			0: begin //start state
 					temp1=w_const;
