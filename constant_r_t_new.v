@@ -22,14 +22,14 @@ module constant_r_t_new(
 reg [`DATA_LENGTH : 0] q_r_Reg, m_r_Reg, a_r_Reg = 1025'b0;
 reg flag_r;
 reg [`DATA_LENGTH : 0] count_r;
-reg [12 : 0] div_const = 11'd1024; //Need to change to scale up
+reg [12 : 0] div_const = 12'd1024; //Need to change to scale up
 
 
 /****** Stuff for t ******/
 
 reg [`T_DATA - 1 : 0] q_t_Reg, m_t_Reg, a_t_Reg = 2048'b0;
 reg flag_t;
-reg [`T_DATA - 1 : 0] count_t;
+reg [15 : 0] count_t;
 
 
 /****** Stuff for both ******/
@@ -96,7 +96,8 @@ always @ (posedge clk)
 				q_t_Reg = a_r_Reg * a_r_Reg;
 				m_t_Reg = M_r; //n
 				a_t_Reg = 2048'b0; //0
-				count_t = 2048'd2048;
+				count_t = 16'd2048;
+
 				state = 2'b11;
 				flag_t = 1;
 			end
