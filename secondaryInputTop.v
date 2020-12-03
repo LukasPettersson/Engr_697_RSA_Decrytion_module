@@ -7,7 +7,7 @@ module secondaryInputTop( input start, clk,
                           input [`DATA_LENGTH - 1 : 0] n,
                           output [`DATA_WIDTH - 1 : 0] n0p,
                           output reg [`DATA_WIDTH - 1 : 0] r, t,
-                          output reg done,
+                            output reg done,
                           output reg startTransfer);
 
 
@@ -20,7 +20,7 @@ reg startCompute;
 reg n0prime_flag, r_t_flag;
 reg [`DATA_LENGTH - 1 : 0] r_reg, t_reg;
 wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire;
-reg [1:0] state;
+reg [2:0] state;
 reg [6:0] count;
 constant_r_t_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
@@ -41,6 +41,7 @@ initial begin
 		count = 0;
 		startTransfer = 0;
 		state = 4;
+    done = 0;
 end
 
 //janky?
@@ -55,7 +56,7 @@ always@ (posedge clk) begin
   end
 end
 always@ (posedge clk) begin
-	
+
 	if (start) begin
 		state = 0;
 	end
@@ -92,10 +93,11 @@ always@ (posedge clk) begin
         end
         else begin
           done = 1;
+          state = 4;
         end
       end
 		4:begin //idle state
-		
+		  done = 0;
 		end
   endcase
 end
