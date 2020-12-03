@@ -66,7 +66,7 @@ module MonPro
 
 								reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
 								reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
-								reg [5 : 0] count_input = 6'd0;
+								reg [6 : 0] count_input = 7'd0;
 								reg start_secondary;
 								wire startTransfer;
 								integer i, j, k, k_e1, k_e2;
@@ -85,13 +85,13 @@ MultiplyAdd m0 (.clk(clk),.x(x0),.y(y0),.z(z0),.cin(last_c0),.s(s0),.cout(c0));
 secondaryInputTop sip0 (.start(start_secondary), .clk(clk), .n(n_full), .n0p(n0p_out), .r(r_out), .t(t_out), .done(secondary_input_done), .startTransfer(startTransfer));
 
 	/********************************************************************************************************************************************************/
-	/*	Different from Original: 																															*/
-	/*								z -> carry																												*/
-	/*								m -> m_multiply_add																										*/
-	/*								Timer for receiving inputs -> count_input 																				*/
-	/*								all parts for secondary constants since we receive it differently 														*/
-	/*								m_in e_in t_in r_in n_in -> without the _in 																			*/
-	/*								nprime0 -> n0p_out and n0prime 																							*/
+	/*	Different from Original: 																																										*/
+	/*								z -> carry																																								*/
+	/*								m -> m_multiply_add																																					*/
+	/*								Timer for receiving inputs -> count_input 																													*/
+	/*								all parts for secondary constants since we receive it differently 																					*/
+	/*								m_in e_in t_in r_in n_in -> without the _in 																													*/
+	/*								nprime0 -> n0p_out and n0prime 																																	*/
 	/********************************************************************************************************************************************************/
 
 initial begin
@@ -189,10 +189,10 @@ begin
 			end
 		end
 
-		CALC_M_BAR:
+		CALC_M_BAR: // calculate m_bar = MonPro(m, t) and copy: c_bar = r
 		begin
 			case(state)
-				S0: begin
+				S0: begin 	// vector(v) = x[0] * y + prev[vector(v)] + z
 					if(k == 0) begin
 						x0 <= m[i];
 						y0 <= t[j];
@@ -211,7 +211,7 @@ begin
 						k = 0;
 					end //end else if
 				end //end of S0
-				S1: begin
+				S1: begin // (C, S) = v[s] + C, v[s] = S, v[s + 1] = C
 					if(k == 0) begin
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -227,7 +227,7 @@ begin
 					end //else if
 				end // end S1
 				S2:
-				begin
+				begin // m = (v[0] * n0_prime) mod 2^w
 					if(k == 0) begin
 						x0 <=v[0];
 						y0 <= n0prime;
@@ -242,7 +242,8 @@ begin
 					end // end if if(k == 1)
 				end//end S2
 				S3:
-				begin
+				// (C, S) = v[0] + m * n[0]
+				begin // vector(v) = (m * vector(n) + vector(v)) >> WIDTH
 					if(j == 0) begin
 							if(k == 0) begin
 								x0 <= m_multiply_add;
@@ -278,7 +279,7 @@ begin
 						end //else
 				end //end S3
 				S4:
-				begin
+				begin //	(C, S) = v[s] + C, v[s - 1] = S
 					if(k == 0) begin
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -294,7 +295,7 @@ begin
 					end
 				end //end S4
 				S5:
-				begin
+				begin // v[s] = v[s + 1] + C
 					if(k == 0) begin
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -320,6 +321,7 @@ begin
 					// store into m_bar and c_bar
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						m_bar[i] = v[i];
+						
 					end
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						c_bar[i] = r[i];
@@ -341,7 +343,7 @@ begin
 			endcase
 		end //end CALC_M_BAR
 
-		GET_K_E:
+		GET_K_E: // a clock to initial the leftmost 1 in e = k_e
 		begin
 			if(e[k_e1][k_e2] == 1) begin
 				$display("e[%d][%d] = %d", k_e1, k_e2, e[k_e1][k_e2]);
@@ -358,11 +360,11 @@ begin
 			end
 		end // end GET_K_E
 
-		BIGLOOP:
+		BIGLOOP: // for i = k_e1 * `DATA_WIDTH + k_e2 downto 0
 		begin
-			case(state)
+			case(state) // c_bar = MonPro(c_bar, c_bar)
 				S0:
-				begin
+				begin // vector(v) = x[0] * y + prev[vector(v)] + z
 					if(k == 0) begin	// first clock: initial input
 						// initial a new multiplier computation
 						x0 <= c_bar[i];
@@ -384,7 +386,7 @@ begin
 					end
 				end // end S0
 				S1:
-				begin
+				begin // (C, S) = v[s] + C, v[s] = S, v[s + 1] = C
 					if(k == 0) begin	// first clock: initial input
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -400,7 +402,7 @@ begin
 					end
 				end // end S1
 				S2:
-				begin
+				begin // m = (v[0] * n0_prime) mod 2^w
 					if(k == 0) begin	// first clock: initial input
 						x0 <= v[0];
 						y0 <= n0prime;
@@ -415,7 +417,8 @@ begin
 					end
 				end //end S2
 				S3:
-				begin
+				begin// vector(v) = (m * vector(n) + vector(v)) >> WIDTH
+						 // (C, S) = v[0] + m * n[0]
 					if(j == 0) begin
 						if(k == 0) begin	// first clock: initial input
 							x0 <= m_multiply_add;
@@ -451,7 +454,7 @@ begin
 					end
 				end // end S3
 				S4:
-				begin
+				begin //	(C, S) = v[s] + C, v[s - 1] = S
 					if(k == 0) begin
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -467,7 +470,7 @@ begin
 					end
 				end //end S4
 				S5:
-				begin
+				begin // v[s] = v[s + 1] + C
 					if(k == 0) begin
 						x0 <= 32'h00000000;
 						y0 <= 32'h00000000;
@@ -524,7 +527,7 @@ begin
 			endcase
 		end // end BIGLOOP
 
-		CALC_C_BAR_M_BAR:
+		CALC_C_BAR_M_BAR: // c_bar = MonPro(c_bar, m_bar)
 		begin
 			case (state)	// c_bar = MonPro(c_bar, c_bar)
 				S0:
