@@ -320,6 +320,7 @@ begin
 					// store into m_bar and c_bar
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						m_bar[i] = v[i];
+					$display("m_bar %d", m_bar[i]);
 					end
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						c_bar[i] = r[i];
