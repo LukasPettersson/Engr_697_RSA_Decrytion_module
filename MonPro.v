@@ -33,7 +33,7 @@ module MonPro
 								reg [`DATA_WIDTH - 1 : 0] m [`DATA_WIDTH - 1 : 0]; // for m_input
 								reg [`DATA_WIDTH - 1 : 0] e [`DATA_WIDTH - 1 : 0]; // for e_input
 								reg [`DATA_WIDTH - 1 : 0] n [`TOTAL_ADDR - 1 : 0]; //for n input -- need n_full also for secondary constants
-								reg [`DATA_LENGTH - 1 : 0] n_full;
+								reg [`DATA_LENGTH - 1 : 0] n_full, res_full;
 
 										/******************************/
 										/*****secondary constants *****/
@@ -115,6 +115,7 @@ initial begin
 	k_e2 = `DATA_WIDTH - 1;
 	//out stuff
 	n_full = 0;
+	res_full = 0;
 	start_secondary = 0;
 end
 
@@ -892,6 +893,7 @@ begin
 		begin
 			if(i < `TOTAL_ADDR) begin
 				res_out = c_bar[i];
+				res_full = {res_out, res_full[`DATA_LENGTH - 1 : `DATA_WIDTH]};
 				i = i + 1;
 			end
 			else begin
