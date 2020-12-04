@@ -1,7 +1,7 @@
 `define DATA_WIDTH 64 //used
-`define ADDR_WIDTH 6
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 4096
+`define ADDR_WIDTH 4
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
 
 module n0prime(
 							input [`DATA_LENGTH - 1 : 0] n,
@@ -18,7 +18,7 @@ module n0prime(
 	*/
 reg [`DATA_LENGTH : 0] t,qinv;
 reg [`DATA_LENGTH : 0] temp1, temp2;
-reg [`DATA_LENGTH : 0] w_const = 4096'h10000000000000000;
+reg [`DATA_LENGTH : 0] w_const = 1024'h10000000000000000;//1024'h100000000;
 reg [`DATA_LENGTH : 0] b1, b2;
 wire [`DATA_LENGTH : 0] b;
 reg [2:0] state = 5;
@@ -38,12 +38,12 @@ nonrestoringdiv div(
 										.done(divDone)
 									);
 
-always@ (posedge clk) begin
-if(start)
-		state = 0;
-end
+
 assign b = b2 - Q_out*b1;
 always@ (posedge clk) begin
+		if(start) begin
+			state = 0;
+		end
 		case(state)
 			0: begin //start state
 					temp1=w_const;

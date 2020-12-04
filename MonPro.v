@@ -2,9 +2,9 @@
 
 // Parameters for reference
 `define DATA_WIDTH 64 //used
-`define ADDR_WIDTH 6
+`define ADDR_WIDTH 4
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 4096
+`define DATA_LENGTH 1024
 
 module MonPro
 (
@@ -30,8 +30,8 @@ module MonPro
 										/*********** Inputs ***********/
 										/******************************/
 
-								reg [`DATA_WIDTH - 1 : 0] m [`DATA_WIDTH - 1 : 0]; // for m_input
-								reg [`DATA_WIDTH - 1 : 0] e [`DATA_WIDTH - 1 : 0]; // for e_input
+								reg [`DATA_WIDTH - 1 : 0] m [`TOTAL_ADDR - 1 : 0]; // for m_input
+								reg [`DATA_WIDTH - 1 : 0] e [`TOTAL_ADDR - 1 : 0]; // for e_input
 								reg [`DATA_WIDTH - 1 : 0] n [`TOTAL_ADDR - 1 : 0]; //for n input -- need n_full also for secondary constants
 								reg [`DATA_LENGTH - 1 : 0] n_full, res_full;
 
@@ -40,8 +40,8 @@ module MonPro
 										/******************************/
 
 								reg [`DATA_WIDTH - 1 : 0] n0prime;
-								reg [`DATA_WIDTH - 1 : 0] r [`DATA_WIDTH - 1 : 0];
-								reg [`DATA_WIDTH - 1 : 0] t [`DATA_WIDTH - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] r [`TOTAL_ADDR - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] t [`TOTAL_ADDR - 1 : 0];
 								wire [`DATA_WIDTH - 1 : 0] r_out;	 //
 								wire [`DATA_WIDTH - 1 : 0] t_out;	 //  _out variables are for receiving parts of r/t.
 								wire [`DATA_WIDTH - 1 : 0] n0p_out; //
@@ -51,7 +51,7 @@ module MonPro
 										/******************************/
 
 								reg [`DATA_WIDTH - 1 : 0] carry; // "z" in example code, seemed simpler to call it carry bc it's assigned the carry bit
-								reg [`DATA_WIDTH - 1 : 0] v [`DATA_WIDTH + 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] v [`TOTAL_ADDR + 1 : 0];
 								reg [`DATA_WIDTH - 1 : 0] m_multiply_add; // m in original
 								reg [`DATA_WIDTH - 1 : 0] x0;
 								reg [`DATA_WIDTH - 1 : 0] y0;
@@ -64,9 +64,9 @@ module MonPro
 										/*****Used in MonPro Algo *****/
 										/******************************/
 
-								reg [`DATA_WIDTH - 1 : 0] m_bar [`DATA_WIDTH - 1 : 0];
-								reg [`DATA_WIDTH - 1 : 0] c_bar [`DATA_WIDTH - 1 : 0];
-								reg [`ADDR_WIDTH : 0] count_input = 7'd0;
+								reg [`DATA_WIDTH - 1 : 0] m_bar [`TOTAL_ADDR - 1 : 0];
+								reg [`DATA_WIDTH - 1 : 0] c_bar [`TOTAL_ADDR - 1 : 0];
+								reg [`ADDR_WIDTH : 0] count_input = 5'd0;
 								reg start_secondary;
 								wire startTransfer;
 								integer i, j, k, k_e1, k_e2;
@@ -154,7 +154,7 @@ begin
 		LOAD_M_E_N:
 		begin
 		// take in message and private key and n, store in buffers.
-			if(count_input < `DATA_WIDTH) begin //if i < 32
+			if(count_input < `TOTAL_ADDR) begin //if i < 32
 				m[count_input] = m_input;
 				e[count_input] = e_input;
 				n[count_input] = n_input;
@@ -171,7 +171,7 @@ begin
 		begin
 			start_secondary = 0;
 			if(startTransfer) begin
-				count_input = `DATA_WIDTH - 1;
+				count_input = `TOTAL_ADDR - 1;
 				exp_state = CATCH_SECONDARY_INPUTS;
 			end
 		end
@@ -203,6 +203,7 @@ begin
 					else if(k ==1) begin
 						v[j] <= s0;
 						carry <= c0;
+						$display("v[%d] = %h and carry = %h", j, s0, c0);
 						j = j + 1;
 						if(j == `TOTAL_ADDR) begin //TOTAL_ADDR = 32-bit
 							j = 0;

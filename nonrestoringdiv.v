@@ -1,7 +1,7 @@
 `define DATA_WIDTH 64 //used
-`define ADDR_WIDTH 6
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 4096
+`define ADDR_WIDTH 4
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define DATA_LENGTH 1024
 
 module nonrestoringdiv(
 	input clk,
@@ -13,7 +13,7 @@ module nonrestoringdiv(
 	output reg done);
 
 reg [`DATA_LENGTH : 0] qReg, mReg;
-reg [`DATA_LENGTH : 0] aReg = 4097'b0;
+reg [`DATA_LENGTH : 0] aReg = 1025'b0;
 reg flag;
 reg [`DATA_LENGTH : 0] count;
 reg state = 0;
@@ -37,9 +37,9 @@ always @ (posedge clk)
 				begin
 					qReg = Q;
 					mReg = M;
-					aReg = 4097'b0;
+					aReg = 1025'b0;
 					done = 0;
-					count = 4097'd4097;
+					count = 1025'd1025;
 					state = 1;
 					flag = 1;
 				end

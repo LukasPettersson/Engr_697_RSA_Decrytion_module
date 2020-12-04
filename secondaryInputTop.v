@@ -1,13 +1,13 @@
 `define DATA_WIDTH 64 //used
-`define ADDR_WIDTH 6
+`define ADDR_WIDTH 4
 `define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
-`define DATA_LENGTH 4096
+`define DATA_LENGTH 1024
 
 module secondaryInputTop( input start, clk,
                           input [`DATA_LENGTH - 1 : 0] n,
                           output [`DATA_WIDTH - 1 : 0] n0p,
                           output reg [`DATA_WIDTH - 1 : 0] r, t,
-                          output reg done,
+                            output reg done,
                           output reg startTransfer);
 
 
@@ -19,9 +19,9 @@ t:
 reg startCompute;
 reg n0prime_flag, r_t_flag;
 reg [`DATA_LENGTH - 1 : 0] r_reg, t_reg;
-wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire; // [4095 : 0]
-reg [1:0] state;
-reg [`ADDR_WIDTH:0] count;
+wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire;
+reg [2:0] state;
+reg [6:0] count;
 constant_r_t_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
                         .start(start),
@@ -35,17 +35,15 @@ n0prime n0(   .n(n),
               .clk(clk),
               .done(n0prime_done));
 
-
-always@ (posedge clk) begin
-  done = 0;
-  if(start) begin
+initial begin
     r_t_flag = 0;
     n0prime_flag = 0;
     count = 0;
     startTransfer = 0;
-    state = 0;
-  end
+    state = 4;
+    done = 0;
 end
+
 //janky?
 always@ (posedge clk) begin
   if(n0prime_done) begin
@@ -59,6 +57,9 @@ always@ (posedge clk) begin
 end
 always@ (posedge clk) begin
 
+  if (start) begin
+    state = 0;
+  end
   case(state)
 
   0: begin
@@ -81,7 +82,7 @@ always@ (posedge clk) begin
   end
 
   3: begin
-        if(count <= `DATA_WIDTH) begin
+        if(count <= `TOTAL_ADDR) begin
           r = r_reg[(`DATA_LENGTH - 1) : (`DATA_LENGTH - `DATA_WIDTH )];    // r = r_reg[1023 : 992]
 
           r_reg = {r_reg[(`DATA_LENGTH - 1) - (`DATA_WIDTH - 1) - 1 : 0],64'b0}; //r_reg {r_reg[991 : 0], 32'b0}
@@ -92,8 +93,12 @@ always@ (posedge clk) begin
         end
         else begin
           done = 1;
+          state = 4;
         end
       end
+    4:begin //idle state
+      done = 0;
+    end
   endcase
 end
 endmodule
