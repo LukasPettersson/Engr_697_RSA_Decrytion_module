@@ -1,6 +1,6 @@
 `define DATA_WIDTH 32 //used
 `define ADDR_WIDTH 5
-`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32 
+`define TOTAL_ADDR (2 ** `ADDR_WIDTH) //used. 32
 `define DATA_LENGTH 1024
 
 module nonrestoringdiv(
@@ -12,11 +12,11 @@ module nonrestoringdiv(
 	output [`DATA_LENGTH : 0] R, //Remainder
 	output reg done);
 
-reg [`DATA_LENGTH : 0] qReg, mReg;
-reg [`DATA_LENGTH : 0] aReg = 1025'b0;
-reg flag;
-reg [`DATA_LENGTH : 0] count;
-reg state = 0;
+	reg [`DATA_LENGTH : 0] qReg, mReg;
+	reg [`DATA_LENGTH : 0] aReg = 1025'b0;
+	reg flag;
+	reg [`DATA_LENGTH : 0] count;
+	reg state = 0;
 
 /*
 initial begin

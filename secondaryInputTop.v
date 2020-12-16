@@ -22,7 +22,7 @@ reg [`DATA_LENGTH - 1 : 0] r_reg, t_reg;
 wire [`DATA_LENGTH - 1 : 0] r_wire, t_wire;
 reg [2:0] state;
 reg [6:0] count;
-constant_r_t_new rt0(   .clk(clk),
+constant_r_t_new_new rt0(   .clk(clk),
                         .M_r(n), // M is divisor this is n
                         .start(start),
                         .R_r(r_wire), //Remainder for r

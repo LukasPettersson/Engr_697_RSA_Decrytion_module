@@ -1,5 +1,3 @@
-//`include "_parameter.v"
-
 // Parameters for reference
 `define DATA_WIDTH 32 //used
 `define ADDR_WIDTH 5
@@ -322,7 +320,7 @@ begin
 					// store into m_bar and c_bar
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						m_bar[i] = v[i];
-						
+
 					end
 					for(i = 0; i < `TOTAL_ADDR; i = i + 1) begin
 						c_bar[i] = r[i];
